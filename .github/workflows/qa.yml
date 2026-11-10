@@ -1,0 +1,42 @@
+name: QA
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  core:
+    name: 단위 테스트 · 데이터 검사 · 확률 검증 · 추적 리포트
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: QA 파이프라인
+        run: bash scripts/test-all.sh
+      - name: 결과 올리기
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-report
+          path: artifacts/
+
+  mutation:
+    name: 뮤테이션 스모크 (테스트가 버그를 잡는지)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: mkdir -p artifacts && python scripts/mutation_smoke.py
+
+  # Unity 테스트는 라이선스 시크릿(UNITY_LICENSE 등)이 필요해 로컬 스크립트(scripts/run-unity-tests.sh)로 돌린다.
+  # game-ci/unity-test-runner 로 옮길 때는 docs/TEST_PLAN.md 의 "CI 확장" 참고.

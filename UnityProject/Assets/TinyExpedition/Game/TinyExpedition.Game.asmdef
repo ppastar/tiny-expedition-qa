@@ -1,0 +1,14 @@
+{
+    "name": "TinyExpedition.Game",
+    "rootNamespace": "TinyExpedition.Game",
+    "references": ["TinyExpedition.Core", "UnityEngine.UI"],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

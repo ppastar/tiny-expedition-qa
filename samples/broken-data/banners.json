@@ -1,0 +1,68 @@
+[
+  {
+    "Id": "b_standard",
+    "Name": "상시 모집",
+    "CostPerPull": 150,
+    "RateBp": {
+      "ThreeStar": 250,
+      "TwoStar": 1800,
+      "OneStar": 7900
+    },
+    "Pool": {
+      "ThreeStar": [
+        "c_lumi",
+        "c_kai",
+        "c_ella"
+      ],
+      "TwoStar": [
+        "c_firefly",
+        "c_mushroom",
+        "c_pebble"
+      ],
+      "OneStar": [
+        "c_acorn",
+        "c_moss",
+        "c_reed"
+      ]
+    },
+    "PickupId": null,
+    "PickupShareBp": 0,
+    "HardPity": 90,
+    "TenPullGuarantee": true,
+    "DisclosedEffectiveThreeStarBp": 250
+  },
+  {
+    "Id": "b_lumi",
+    "Name": "달빛 픽업 모집",
+    "CostPerPull": 150,
+    "RateBp": {
+      "ThreeStar": 250,
+      "TwoStar": 1800,
+      "OneStar": 7950
+    },
+    "Pool": {
+      "ThreeStar": [
+        "c_lumi",
+        "c_kai",
+        "c_ella",
+        "c_lumii"
+      ],
+      "TwoStar": [
+        "c_firefly",
+        "c_mushroom",
+        "c_pebble",
+        "c_acorn"
+      ],
+      "OneStar": [
+        "c_acorn",
+        "c_moss",
+        "c_reed"
+      ]
+    },
+    "PickupId": "c_lumi",
+    "PickupShareBp": 5000,
+    "HardPity": 90,
+    "TenPullGuarantee": true,
+    "DisclosedEffectiveThreeStarBp": 279
+  }
+]

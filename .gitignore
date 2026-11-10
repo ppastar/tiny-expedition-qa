@@ -1,0 +1,19 @@
+# Unity
+UnityProject/[Ll]ibrary/
+UnityProject/[Tt]emp/
+UnityProject/[Oo]bj/
+UnityProject/[Bb]uild/
+UnityProject/[Bb]uilds/
+UnityProject/[Ll]ogs/
+UnityProject/[Uu]ser[Ss]ettings/
+UnityProject/CodeCoverage/
+UnityProject/*.csproj
+UnityProject/*.sln
+UnityProject/*.slnx
+# dotnet
+dotnet/**/bin/
+dotnet/**/obj/
+# 생성물
+artifacts/
+.vs/
+.idea/

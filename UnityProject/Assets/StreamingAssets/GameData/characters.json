@@ -1,0 +1,11 @@
+[
+  { "Id": "c_acorn",   "Name": "도토리 정찰병", "Rarity": "OneStar",   "Hp": 420, "Atk": 48, "Def": 20, "Spd": 110, "CritRate": 5 },
+  { "Id": "c_moss",    "Name": "이끼 방패병",   "Rarity": "OneStar",   "Hp": 620, "Atk": 32, "Def": 45, "Spd": 80,  "CritRate": 0 },
+  { "Id": "c_reed",    "Name": "풀피리 견습생", "Rarity": "OneStar",   "Hp": 380, "Atk": 55, "Def": 15, "Spd": 100, "CritRate": 10 },
+  { "Id": "c_firefly", "Name": "반딧불 궁수",   "Rarity": "TwoStar",   "Hp": 520, "Atk": 78, "Def": 25, "Spd": 120, "CritRate": 15 },
+  { "Id": "c_mushroom","Name": "버섯 약사",     "Rarity": "TwoStar",   "Hp": 700, "Atk": 52, "Def": 40, "Spd": 90,  "CritRate": 5 },
+  { "Id": "c_pebble",  "Name": "조약돌 기사",   "Rarity": "TwoStar",   "Hp": 880, "Atk": 60, "Def": 70, "Spd": 75,  "CritRate": 5 },
+  { "Id": "c_lumi",    "Name": "달빛 마법사 루미", "Rarity": "ThreeStar", "Hp": 640, "Atk": 125, "Def": 30, "Spd": 115, "CritRate": 20 },
+  { "Id": "c_kai",     "Name": "회오리 검사 카이", "Rarity": "ThreeStar", "Hp": 760, "Atk": 110, "Def": 45, "Spd": 130, "CritRate": 25 },
+  { "Id": "c_ella",    "Name": "새벽 수호자 엘라", "Rarity": "ThreeStar", "Hp": 1150,"Atk": 70,  "Def": 95, "Spd": 85,  "CritRate": 5 }
+]

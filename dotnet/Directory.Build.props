@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <!-- Unity 6 컴파일러와 맞춘다: 공유 코드에서 C# 10+ 문법(file-scoped namespace 등)을 쓰면 여기서 먼저 깨진다 -->
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+</Project>

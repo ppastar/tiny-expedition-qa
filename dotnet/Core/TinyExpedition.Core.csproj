@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Unity 프로젝트의 Core 소스를 그대로 컴파일한다. 엔진 없이 dotnet test·CI에서 돌리기 위함. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <RootNamespace>TinyExpedition.Core</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\UnityProject\Assets\TinyExpedition\Core\**\*.cs" LinkBase="Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Unity의 com.unity.nuget.newtonsoft-json 3.2.1 과 같은 버전 -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="TinyExpedition.Core.Tests" />
+  </ItemGroup>
+</Project>

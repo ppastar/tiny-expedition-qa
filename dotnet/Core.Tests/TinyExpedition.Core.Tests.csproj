@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- 테스트 소스도 Unity EditMode 테스트 폴더와 공유한다 -->
+    <Compile Include="..\..\UnityProject\Assets\TinyExpedition\Tests\Shared\**\*.cs" LinkBase="Shared" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="NUnit" Version="3.14.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
+    <PackageReference Include="NunitXml.TestLogger" Version="6.1.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\TinyExpedition.Core.csproj" />
+  </ItemGroup>
+</Project>
