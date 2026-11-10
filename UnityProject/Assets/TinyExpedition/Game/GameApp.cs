@@ -125,7 +125,7 @@ namespace TinyExpedition.Game
 
         private void RefreshGems()
         {
-            if (_gemsLabel != null) _gemsLabel.text = "보석 " + Session.State.Gems.ToString("N0");
+            if (_gemsLabel != null) _gemsLabel.text = "보석 " + Session.State.Gems.ToString("N0", System.Globalization.CultureInfo.InvariantCulture);
         }
 
         public void ShowHome()
@@ -150,7 +150,7 @@ namespace TinyExpedition.Game
             var r = Session.Pull(MainBannerId, count);
             if (!r.Ok)
             {
-                Toast(r.Error == ActionError.NotEnoughGems ? "보석이 부족합니다." : r.Error.ToString());
+                Toast(r.Error == ActionError.NotEnoughGems ? "보석이 부족합니다." : "모집 데이터 오류로 모집할 수 없습니다. (보석은 차감되지 않았습니다)");
                 return;
             }
             Save();

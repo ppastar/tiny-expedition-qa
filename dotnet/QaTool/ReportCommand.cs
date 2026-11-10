@@ -150,6 +150,8 @@ tr:last-child td { border-bottom: 0; }
 .tests { font-family: ui-monospace, Consolas, monospace; font-size: 12px; color: var(--muted); }
 .tests .f { color: var(--fail); }
 .id { font-family: ui-monospace, Consolas, monospace; font-weight: 600; white-space: nowrap; }
+td:nth-child(2), td:nth-child(4), td:nth-child(5), td:nth-child(6) { white-space: nowrap; }
+th { white-space: nowrap; }
 .filters { display:flex; gap:8px; flex-wrap: wrap; margin-bottom: 12px; }
 .filters button { border:1px solid var(--line); background:var(--card); color:var(--fg); padding:4px 12px; border-radius:999px; cursor:pointer; font: inherit; font-size: 13px; }
 .filters button.on { border-color: var(--accent); color: var(--accent); font-weight: 600; }

@@ -17,6 +17,8 @@ namespace TinyExpedition.Core
         StageLocked,
         CharacterNotOwned,
         InvalidParty,
+        /// <summary>기획 데이터 오류로 행동을 끝낼 수 없음. 상태는 바뀌지 않는다.</summary>
+        DataError,
     }
 
     public sealed class ActionResult<T>
@@ -71,17 +73,25 @@ namespace TinyExpedition.Core
             long cost = (long)banner.CostPerPull * count;
             if (State.Gems < cost) return ActionResult<IReadOnlyList<PullResult>>.Fail(ActionError.NotEnoughGems);
 
-            if (!State.Pity.TryGetValue(bannerId, out var pity))
+            // 뽑기는 천장 사본으로 먼저 끝까지 돌리고, 성공했을 때만 보석·천장·보유를 한 번에 반영한다.
+            // (데이터 오류로 중간에 실패하면 "보석만 빠지고 결과는 없는" 상태가 되지 않게)
+            State.Pity.TryGetValue(bannerId, out var savedPity);
+            var pity = new PityState { PullsSinceThreeStar = savedPity?.PullsSinceThreeStar ?? 0 };
+            IReadOnlyList<PullResult> results;
+            try
             {
-                pity = new PityState();
-                State.Pity[bannerId] = pity;
+                results = count == 1
+                    ? new[] { _gacha.PullOne(banner, pity, _rng) }
+                    : _gacha.PullTen(banner, pity, _rng);
+            }
+            catch (InvalidOperationException)
+            {
+                _rng = new Pcg32(State.RngSeed); // 난수도 행동 전 상태로
+                return ActionResult<IReadOnlyList<PullResult>>.Fail(ActionError.DataError);
             }
 
             State.Gems -= (int)cost;
-            IReadOnlyList<PullResult> results = count == 1
-                ? new[] { _gacha.PullOne(banner, pity, _rng) }
-                : _gacha.PullTen(banner, pity, _rng);
-
+            State.Pity[bannerId] = pity;
             foreach (var r in results)
             {
                 State.Owned.TryGetValue(r.CharacterId, out int n);

@@ -23,6 +23,8 @@ MUTATIONS = [
      "bool needGuarantee = banner.TenPullGuarantee && lastSlot", "bool needGuarantee = false && lastSlot"),
     ("등급 확률 누적 순서 오류 (2성 구간을 두 번 더함)", "Gacha/GachaService.cs",
      "acc += bp;", "acc += r == Rarity.TwoStar ? bp * 2 : bp;"),
+    ("모집 실패해도 보석이 먼저 빠짐 (차감 순서 오류)", "GameSession.cs",
+     "_rng = new Pcg32(State.RngSeed); // 난수도 행동 전 상태로", "State.Gems -= (int)cost; _rng = new Pcg32(State.RngSeed);"),
     ("보석 부족 판정 경계 오류 (같으면 실패)", "GameSession.cs",
      "if (State.Gems < cost)", "if (State.Gems <= cost)"),
     ("첫 클리어 보상 중복 지급", "GameSession.cs",
@@ -79,16 +81,18 @@ def main() -> int:
     survived = []
     for desc, rel, before, after in MUTATIONS:
         path = CORE / rel
-        original = path.read_text(encoding="utf-8")
-        if before not in original:
+        original = path.read_bytes()
+        if b"\r\n" in original:  # 작업 폴더가 CRLF면 코드 조각도 CRLF로 맞춘다
+            before, after = before.replace("\n", "\r\n"), after.replace("\n", "\r\n")
+        if before.encode("utf-8") not in original:
             print(f"[건너뜀] {desc}: 원본 코드 조각을 찾지 못함 (코드가 바뀌었으면 목록을 갱신)")
             survived.append(desc)
             continue
         try:
-            path.write_text(original.replace(before, after, 1), encoding="utf-8")
+            path.write_bytes(original.replace(before.encode("utf-8"), after.encode("utf-8"), 1))
             result, failed_tcs = run_tests()
         finally:
-            path.write_text(original, encoding="utf-8")
+            path.write_bytes(original)
         if result == "pass":
             print(f"[생존] {desc}  ← 이 버그를 잡는 테스트가 없음")
             survived.append(desc)

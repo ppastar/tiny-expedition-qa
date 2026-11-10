@@ -125,6 +125,23 @@ namespace TinyExpedition.Tests
             Assert.That(s.State.Owned["one_a"], Is.EqualTo(10));
         }
 
+        [Test, TC("GACHA-015")]
+        public void BrokenBanner_FailsWithoutTakingGems()
+        {
+            // 2성 확률 100%인데 2성 후보가 비어 있는 잘못된 배너 (검증기를 거치지 않고 들어왔다고 가정)
+            var banner = TestData.Banner(0, 10000, 0);
+            banner.Pool[Rarity.TwoStar].Clear();
+            var s = Session(3000, banner);
+            s.State.Pity["b_test"] = new PityState { PullsSinceThreeStar = 5 };
+
+            var r = s.Pull("b_test", 10);
+
+            Assert.That(r.Error, Is.EqualTo(ActionError.DataError));
+            Assert.That(s.State.Gems, Is.EqualTo(3000), "실패한 모집은 보석을 가져가면 안 됨");
+            Assert.That(s.State.Pity["b_test"].PullsSinceThreeStar, Is.EqualTo(5), "천장 카운트도 그대로");
+            Assert.That(s.State.Owned, Is.Empty);
+        }
+
         [Test, TC("GACHA-014")]
         public void InvalidPullCount_Throws()
         {
