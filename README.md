@@ -1,5 +1,7 @@
 # 작은 원정대 (Tiny Expedition) — 게임 QA 자동화 포트폴리오
 
+[![QA](https://github.com/ppastar/tiny-expedition-qa/actions/workflows/qa.yml/badge.svg)](https://github.com/ppastar/tiny-expedition-qa/actions/workflows/qa.yml)
+
 모집(가챠)·자동 전투·미니게임이 있는 작은 Unity 게임을 직접 만들고,
 **테스트 케이스 설계 → 자동화 테스트 → QA 도구 → CI**까지 한 흐름으로 구현한 프로젝트입니다.
 
@@ -21,7 +23,7 @@ QA로 일을 시작해 SDET·플랫폼 엔지니어로 넘어온 경험을 게�
 | TC 문서 | [`docs/test-cases.csv`](docs/test-cases.csv) — 60개 (자동화 58 · 수동 2), 영역·우선순위·유형·실행 환경 포함 |
 | 자동화 테스트 | NUnit 72개 — dotnet에서 실행·통과 확인. 같은 소스를 Unity EditMode 테스트로도 쓰도록 구성 (Unity 실행은 아직) / Unity PlayMode UI 테스트 4개 (작성, 아직 실행 안 함) |
 | QA 도구 | `qa-tool` CLI — 데이터 검사 · 확률 검증 · 전투/미니게임 리플레이 · TC 추적 리포트 / 뮤테이션 스모크 16/16 (모두 실행 확인) · Unity 에디터 메뉴·빌드 훅 (작성, 아직 실행 안 함) |
-| CI | GitHub Actions 워크플로 — 테스트·데이터 검사·확률 검증(배너당 100만 회)·리포트. 같은 스크립트(`scripts/test-all.sh`)를 로컬에서 실행해 통과 확인 |
+| CI | GitHub Actions — 테스트·데이터 검사·확률 검증(배너당 100만 회)·추적 리포트를 push·PR마다, 뮤테이션 스모크를 PR·수동 실행 때 돌림 (Ubuntu에서 통과 확인) |
 
 ## 구조
 
@@ -176,7 +178,7 @@ Unity에서 열 때는 Unity Hub에서 `UnityProject` 폴더를 추가하고, �
 
 ## 현재 상태와 한계
 
-- **dotnet 쪽(규칙 테스트 72개·도구·뮤테이션 16/16)은 로컬에서 실행해 통과를 확인했습니다.** GitHub Actions 워크플로는 같은 스크립트를 부르지만 아직 Actions에서 돌려 보지는 않았습니다.
+- **dotnet 쪽(규칙 테스트 72개·도구·뮤테이션 16/16)은 로컬에서 실행해 통과를 확인했습니다.** 같은 파이프라인과 뮤테이션 스모크가 GitHub Actions(Ubuntu)에서도 통과합니다.
 - **Unity 쪽(화면, EditMode/PlayMode 테스트, 에디터 메뉴·빌드 훅, 디버그 패널)은 코드만 작성했고 아직 Unity에서 컴파일·실행하지 못했습니다.** 작성한 PC에서 Unity 라이선스가 활성화되어 있지 않았습니다. 리포트에서는 이 4개 UI TC가 "미실행"으로 따로 표시됩니다.
 - 데이터를 `File` API로 읽으므로 Windows/에디터 기준입니다. Android·WebGL은 `UnityWebRequest`로 StreamingAssets를 읽도록 바꿔야 합니다.
 - 한글 표시는 OS 폰트(맑은 고딕 등)에 기대고 있어 WebGL에서는 한글 폰트를 따로 넣어야 합니다.
