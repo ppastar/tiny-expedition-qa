@@ -6,6 +6,7 @@ using TinyExpedition.Game;
 using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
+using Property = NUnit.Framework.PropertyAttribute;
 
 namespace TinyExpedition.Tests.PlayMode
 {
@@ -29,7 +30,7 @@ namespace TinyExpedition.Tests.PlayMode
         public void TearDown()
         {
             if (_app != null) Object.Destroy(_app.gameObject);
-            foreach (var es in Object.FindObjectsByType<UnityEngine.EventSystems.EventSystem>(FindObjectsSortMode.None))
+            foreach (var es in Object.FindObjectsByType<UnityEngine.EventSystems.EventSystem>())
                 Object.Destroy(es.gameObject);
             try { Directory.Delete(_tempDir, true); } catch (IOException) { }
         }

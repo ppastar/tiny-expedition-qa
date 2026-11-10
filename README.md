@@ -21,8 +21,9 @@ QA로 일을 시작해 SDET·플랫폼 엔지니어로 넘어온 경험을 게�
 |---|---|
 | 게임 | Unity 6 (6000.5) · uGUI를 코드로 구성 · 모집 / 원정(자동 전투) / 미니게임 "별빛 타이밍" / QA 디버그 패널 |
 | TC 문서 | [`docs/test-cases.csv`](docs/test-cases.csv) — 60개 (자동화 58 · 수동 2), 영역·우선순위·유형·실행 환경 포함 |
-| 자동화 테스트 | NUnit 72개 — dotnet에서 실행·통과 확인. 같은 소스를 Unity EditMode 테스트로도 쓰도록 구성 (Unity 실행은 아직) / Unity PlayMode UI 테스트 4개 (작성, 아직 실행 안 함) |
-| QA 도구 | `qa-tool` CLI — 데이터 검사 · 확률 검증 · 전투/미니게임 리플레이 · TC 추적 리포트 / 뮤테이션 스모크 16/16 (모두 실행 확인) · Unity 에디터 메뉴·빌드 훅 (작성, 아직 실행 안 함) |
+| 자동화 테스트 | NUnit 72개 — dotnet과 Unity EditMode에서 같은 소스로 실행, 둘 다 통과 / Unity PlayMode UI 테스트 4개 통과 / 실제 빌드 자동 플레이 스모크 |
+| 커버리지 | 게임 규칙(Core) 라인 92.7% · 화면(Game) 58.9% — Unity Code Coverage ([요약](docs/reports/coverage-summary.md)) |
+| QA 도구 | `qa-tool` CLI — 데이터 검사 · 확률 검증 · 전투/미니게임 리플레이 · TC 추적 리포트 / 뮤테이션 스모크 16/16 · 빌드 자동 플레이(`-qaAutoplay`) · Unity 에디터 메뉴·빌드 전 데이터 검사 훅 |
 | CI | GitHub Actions — 테스트·데이터 검사·확률 검증(배너당 100만 회)·추적 리포트를 push·PR마다, 뮤테이션 스모크를 PR·수동 실행 때 돌림 (Ubuntu에서 통과 확인) |
 
 ## 구조
@@ -54,7 +55,7 @@ scripts/             ← 전체 파이프라인, Unity 테스트 실행, 뮤테�
 게임 규칙을 엔진과 분리한 `Core`에 모았습니다. 그래서
 
 1. **테스트가 빠릅니다.** 72개가 1초 안에 끝나고, Unity를 켜지 않고도 CI에서 돌 수 있습니다(Unity 라이선스 불필요).
-2. **같은 테스트를 두 곳에서 돌리도록 구성했습니다.** `Tests/Shared`는 Unity EditMode 테스트 어셈블리이면서, `dotnet/Core.Tests`가 같은 파일을 링크해 컴파일합니다. 난수는 PCG 공식 레퍼런스 값과 대조하는 테스트(RNG-001)가 있어, Unity(Mono)에서 돌리면 런타임이 달라도 같은 수열인지가 확인됩니다.
+2. **같은 테스트를 두 곳에서 돌립니다.** `Tests/Shared`는 Unity EditMode 테스트 어셈블리이면서, `dotnet/Core.Tests`가 같은 파일을 링크해 컴파일합니다. 난수를 PCG 공식 레퍼런스 값과 대조하는 테스트(RNG-001)가 .NET과 Unity(Mono) 양쪽에서 통과해, 런타임이 달라도 같은 시드면 같은 결과가 나옴을 확인했습니다.
 3. **도구가 게임 코드를 그대로 씁니다.** 확률 검증기는 확률 로직을 따로 다시 짜지 않고, 게임이 쓰는 `GachaService`를 그대로 100만 번 돌립니다. 검증 대상과 검증 도구가 어긋날 일이 없습니다.
 
 공유 소스는 Unity 6 컴파일러에 맞춰 C# 9 문법으로 제한했습니다(`Directory.Build.props`의 `LangVersion`). C# 10 이상 문법을 쓰면 dotnet 빌드에서 먼저 깨집니다.
@@ -63,10 +64,11 @@ scripts/             ← 전체 파이프라인, Unity 테스트 실행, 뮤테�
 
 | 층 | 무엇을 | 어디서 | 수 |
 |---|---|---|---|
-| 규칙 단위 테스트 | 모집·천장·전투 공식·판정 경계·세이브 | dotnet (+ Unity EditMode 구성) | 72 |
+| 규칙 단위 테스트 | 모집·천장·전투 공식·판정 경계·세이브 | dotnet + Unity EditMode | 72 |
 | 통계 테스트 | 등급 분포(카이제곱), 픽업 비율, 천장 포함 실제 확률 | 위와 같음 (시드 고정이라 흔들리지 않음) | 3 (위 72에 포함) |
 | 데이터 테스트 | 실제 테이블 검사 + 잘못된 테이블을 잡는지 | 위와 같음 + Unity 빌드 훅 | 9 (위 72에 포함) |
-| UI E2E | 부팅 → 모집 → 결과, 미니게임 한 판, 그림 누락 | Unity PlayMode (작성, 아직 실행 안 함) | 4 |
+| UI E2E | 부팅 → 모집 → 결과, 미니게임 한 판, 그림 누락 | Unity PlayMode | 4 |
+| 빌드 스모크 | 실제 Windows 개발 빌드가 홈→모집→전투→미니게임을 스스로 진행, 단계별 스크린샷 | `TinyExpedition.exe -qaAutoplay <폴더>` | 1 흐름 |
 | 수동 탐색 | 실기기 터치 지연, 화면 비율 | 사람 | 2 |
 
 TC 문서의 모든 자동화 TC는 테스트 코드에 `[TC("GACHA-004")]`처럼 번호가 붙어 있어,
@@ -159,7 +161,13 @@ $ qa report --results dotnet=artifacts/dotnet-results.xml,unity-playmode=artifac
 ### 6. 게임 안 QA 디버그 패널
 
 시드 고정, 보석 지급, 천장 직전(89회)으로 이동, 모든 스테이지 열기, 세이브 초기화.
-`UNITY_EDITOR || DEVELOPMENT_BUILD`에서만 컴파일되어 출시 빌드에는 들어가지 않습니다. (작성, 아직 Unity에서 실행 안 함)
+`UNITY_EDITOR || DEVELOPMENT_BUILD`에서만 컴파일되어 출시 빌드에는 들어가지 않습니다.
+
+### 7. 빌드 자동 플레이 `-qaAutoplay`
+
+개발 빌드를 `TinyExpedition.exe -qaAutoplay <폴더>`로 실행하면 홈 → 10연 모집 → 보유 캐릭터 → 원정 1-1 → 미니게임 한 판을 스스로 진행하며 각 화면을 확인(화면 이름·버튼 활성)하고 스크린샷을 남긴 뒤 종료합니다. 하나라도 어긋나면 종료 코드 1. 미니게임은 실제 시간으로 막대를 보고 누르며, 일부러 4번째마다 빗나가게 해 Miss·콤보 초기화까지 지나갑니다.
+
+![자동 플레이 스크린샷](docs/reports/autoplay/contact-sheet.png)
 
 ## 실행
 
@@ -178,7 +186,7 @@ Unity에서 열 때는 Unity Hub에서 `UnityProject` 폴더를 추가하고, �
 
 ## 현재 상태와 한계
 
-- **dotnet 쪽(규칙 테스트 72개·도구·뮤테이션 16/16)은 로컬에서 실행해 통과를 확인했습니다.** 같은 파이프라인과 뮤테이션 스모크가 GitHub Actions(Ubuntu)에서도 통과합니다.
-- **Unity 쪽(화면, EditMode/PlayMode 테스트, 에디터 메뉴·빌드 훅, 디버그 패널)은 코드만 작성했고 아직 Unity에서 컴파일·실행하지 못했습니다.** 작성한 PC에서 Unity 라이선스가 활성화되어 있지 않았습니다. 리포트에서는 이 4개 UI TC가 "미실행"으로 따로 표시됩니다.
+- 규칙 테스트 72개는 dotnet·Unity EditMode 양쪽에서, UI 테스트 4개는 Unity PlayMode에서 통과했습니다. 세 결과를 합친 추적 리포트 기준 자동화 TC 58/58 통과, 수동 TC 2개.
+- 같은 파이프라인과 뮤테이션 스모크가 GitHub Actions(Ubuntu)에서도 통과합니다. Unity 테스트는 라이선스가 필요해 로컬 스크립트로 돌립니다.
 - 데이터를 `File` API로 읽으므로 Windows/에디터 기준입니다. Android·WebGL은 `UnityWebRequest`로 StreamingAssets를 읽도록 바꿔야 합니다.
 - 한글 표시는 OS 폰트(맑은 고딕 등)에 기대고 있어 WebGL에서는 한글 폰트를 따로 넣어야 합니다.

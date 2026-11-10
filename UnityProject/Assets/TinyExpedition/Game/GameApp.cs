@@ -47,8 +47,18 @@ namespace TinyExpedition.Game
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void AutoStart()
         {
-            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Main" && FindAnyObjectByType<GameApp>() == null)
-                Create(new GameAppOptions());
+            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "Main" || FindAnyObjectByType<GameApp>() != null) return;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            var autoplayDir = QaAutoplay.OutDirFromArgs();
+            if (autoplayDir != null)
+            {
+                // 자동 플레이는 실제 세이브를 건드리지 않고, 시드를 고정해 매번 같은 흐름으로 돈다
+                var app = Create(new GameAppOptions { FreshStart = true, Seed = 42, SavePath = System.IO.Path.Combine(autoplayDir, "save.json") });
+                QaAutoplay.Attach(app, autoplayDir);
+                return;
+            }
+#endif
+            Create(new GameAppOptions());
         }
 
         public static GameApp Create(GameAppOptions opts)
