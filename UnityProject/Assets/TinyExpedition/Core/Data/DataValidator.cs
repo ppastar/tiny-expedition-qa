@@ -75,6 +75,11 @@ namespace TinyExpedition.Core.Data
                         issues.Add(Err(T, b.Id, kv.Key + " 확률이 있는데 후보 캐릭터가 없습니다."));
                 }
 
+                // 10연 보정은 2성 확률과 상관없이 1성을 2성으로 바꿔 2성 후보에서 뽑는다 (BUG-002).
+                // 2성 확률이 0이라 위 검사에 걸리지 않아도, 보정이 켜져 있으면 2성 후보가 있어야 한다.
+                if (b.TenPullGuarantee && (!b.Pool.TryGetValue(Rarity.TwoStar, out var twoPool) || twoPool.Count == 0))
+                    issues.Add(Err(T, b.Id, "10연 보정이 켜져 있는데 2성 후보 캐릭터가 없습니다."));
+
                 foreach (var kv in b.Pool)
                 {
                     foreach (var id in kv.Value)

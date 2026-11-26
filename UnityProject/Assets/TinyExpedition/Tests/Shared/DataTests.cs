@@ -79,6 +79,21 @@ namespace TinyExpedition.Tests
             Assert.That(Errors(TestData.Db(new[] { b })).Any(e => e.Message.Contains("공시")), Is.False);
         }
 
+        [Test, TC("DATA-010")]
+        public void TenPullGuaranteeWithoutTwoStarPool_IsError()
+        {
+            // BUG-002: 2성 0%라서 2성 후보를 비워 둔 배너. 확률 검사로는 안 잡히지만 10연 보정이 2성 후보에서 뽑는다.
+            var b = TestData.Banner(250, 0, 9750);
+            b.Pool[Rarity.TwoStar].Clear();
+            Assert.That(Errors(TestData.Db(new[] { b })).Any(e => e.Message.Contains("10연 보정")), Is.True);
+
+            b.TenPullGuarantee = false; // 보정이 꺼져 있으면 2성 후보가 없어도 된다
+            Assert.That(Errors(TestData.Db(new[] { b })).Any(e => e.Message.Contains("10연 보정")), Is.False);
+
+            var withTwoStar = TestData.Banner(250, 0, 9750); // 2성 0%여도 후보가 있으면 통과
+            Assert.That(Errors(TestData.Db(new[] { withTwoStar })).Any(e => e.Message.Contains("10연 보정")), Is.False);
+        }
+
         [Test, TC("DATA-009")]
         public void BrokenJson_ReportsFileName()
         {
