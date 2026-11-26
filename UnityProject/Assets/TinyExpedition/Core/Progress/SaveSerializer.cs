@@ -41,6 +41,9 @@ namespace TinyExpedition.Core.Progress
                 if (kv.Value <= 0) throw new SaveCorruptedException("보유 수가 0 이하인 캐릭터: " + kv.Key);
             foreach (var kv in state.ClearedStages)
                 if (kv.Value < 1 || kv.Value > 3) throw new SaveCorruptedException("별 수가 잘못된 스테이지: " + kv.Key);
+            if (state.ClearedTurnStages == null) state.ClearedTurnStages = new System.Collections.Generic.Dictionary<string, int>();
+            foreach (var kv in state.ClearedTurnStages)
+                if (kv.Value < 1 || kv.Value > 3) throw new SaveCorruptedException("별 수가 잘못된 턴제 스테이지: " + kv.Key);
             return state;
         }
     }

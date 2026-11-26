@@ -27,7 +27,7 @@ public static class ValidateDataCommand
         foreach (var i in issues) Console.WriteLine(i);
         int errors = issues.Count(i => i.Level == IssueLevel.Error);
         int warnings = issues.Count - errors;
-        Console.WriteLine($"캐릭터 {db.Characters.Count} · 배너 {db.Banners.Count} · 스테이지 {db.Stages.Count} — 오류 {errors}, 경고 {warnings}");
+        Console.WriteLine($"캐릭터 {db.Characters.Count} · 배너 {db.Banners.Count} · 스테이지 {db.Stages.Count} · 스킬 {db.Skills.Count} · 턴제 스테이지 {db.TurnStages.Count} — 오류 {errors}, 경고 {warnings}");
         return errors > 0 ? 1 : 0;
     }
 }
@@ -40,13 +40,47 @@ public static class BattleReplayCommand
         var stage = db.GetStage(o.Require("stage"));
         var party = o.Require("party").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Select(db.GetCharacter).ToList();
-        ulong seed = (ulong)o.GetLong("seed", 1);
+        ulong seed = o.GetULong("seed", 1);
 
         var result = BattleSimulator.Run(party, stage, new Pcg32(seed));
         Console.WriteLine($"스테이지 {stage.Id} {stage.Name} · 파티 {string.Join(", ", party.Select(p => p.Name))} · 시드 {seed}");
         foreach (var e in result.Log) Console.WriteLine("  " + e);
         Console.WriteLine($"결과: {result.Outcome} · {result.Rounds}라운드 · 별 {result.Stars}");
         foreach (var a in result.Allies) Console.WriteLine($"  {a.Name}: HP {a.Hp}/{a.MaxHp}");
+        return 0;
+    }
+}
+
+public static class TurnReplayCommand
+{
+    public static int Run(Options o)
+    {
+        var db = Repo.LoadDb(o);
+        var stage = db.GetTurnStage(o.Require("stage"));
+        var party = o.Require("party").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(db.GetCharacter).ToList();
+        ulong seed = o.GetULong("seed", 1);
+        var commands = o.Get("commands", "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(TurnCommand.Parse).ToList();
+        bool autoRest = o.Get("auto", "true") != "false";
+
+        TurnBattle b;
+        try
+        {
+            b = TurnBattle.Replay(party, stage, db, seed, commands, autoRest);
+        }
+        catch (InvalidOperationException e)
+        {
+            Console.Error.WriteLine("리플레이 실패: " + e.Message);
+            return 1;
+        }
+        Console.WriteLine($"턴제 {stage.Id} {stage.Name} · 파티 {string.Join(", ", party.Select(p => p.Name))} · 시드 {seed}");
+        foreach (var e in b.Log) Console.WriteLine("  " + e);
+        Console.WriteLine(b.IsOver
+            ? $"결과: {b.Outcome} · 웨이브 {b.WaveIndex + 1}/{b.WaveCount} · {b.Round}라운드 · 별 {b.Stars}"
+            : $"명령이 모자라 멈춤: 웨이브 {b.WaveIndex + 1}/{b.WaveCount} · {b.Round}라운드 · {b.CurrentActor?.Name}의 차례");
+        foreach (var a in b.Allies) Console.WriteLine($"  {a.Name}: HP {a.Hp}/{a.MaxHp}");
+        Console.WriteLine("명령: " + string.Join(",", b.Commands));
         return 0;
     }
 }

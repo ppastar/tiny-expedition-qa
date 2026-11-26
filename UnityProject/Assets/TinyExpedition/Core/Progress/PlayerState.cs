@@ -17,6 +17,8 @@ namespace TinyExpedition.Core.Progress
         public Dictionary<string, PityState> Pity { get; set; } = new Dictionary<string, PityState>();
         /// <summary>스테이지 id → 최고 별 수(1~3).</summary>
         public Dictionary<string, int> ClearedStages { get; set; } = new Dictionary<string, int>();
+        /// <summary>턴제 스테이지 id → 최고 별 수(1~3). 없던 버전의 세이브는 빈 목록으로 읽힌다.</summary>
+        public Dictionary<string, int> ClearedTurnStages { get; set; } = new Dictionary<string, int>();
         public int MiniGameBestScore { get; set; }
         /// <summary>다음 난수 시드. 세이브/로드 후에도 결과가 이어지도록 저장한다.</summary>
         public ulong RngSeed { get; set; } = 20261111UL;

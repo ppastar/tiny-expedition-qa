@@ -27,8 +27,9 @@ namespace TinyExpedition.Game
     /// <summary>
     /// 게임 화면 전체. 규칙은 전부 Core의 GameSession에 있고, 여기서는 보여주고 입력만 넘긴다.
     /// UI 요소 이름(Btn_*, Label_*)은 PlayMode 테스트가 찾는 계약이므로 바꾸면 테스트도 같이 바꾼다.
+    /// 턴제 전투 화면은 GameApp.TurnBattle.cs에 있다.
     /// </summary>
-    public sealed class GameApp : MonoBehaviour
+    public sealed partial class GameApp : MonoBehaviour
     {
         public const string MainBannerId = "b_lumi";
 
@@ -148,6 +149,7 @@ namespace TinyExpedition.Game
             UiKit.Button("Btn_Pull1", col, "1회 모집 (" + banner.CostPerPull + ")", () => DoPull(1));
             UiKit.Button("Btn_Pull10", col, "10회 모집 (" + banner.CostPerPull * 10 + ")", () => DoPull(10));
             UiKit.Button("Btn_Stages", col, "원정 떠나기", ShowStages, UiKit.Panel);
+            UiKit.Button("Btn_TurnBattle", col, "턴제 전투: 동굴 탐험", ShowTurnStages, UiKit.Panel);
             UiKit.Button("Btn_MiniGame", col, "미니게임: 별빛 타이밍", ShowMiniGame, UiKit.Panel);
             UiKit.Button("Btn_Roster", col, "보유 캐릭터 (" + Session.State.Owned.Count + ")", ShowRoster, UiKit.Panel);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -279,8 +281,9 @@ namespace TinyExpedition.Game
                 "Perfect " + game.Taps.Count(t => t.Judgement == Judgement.Perfect) + " · Good " + game.Taps.Count(t => t.Judgement == Judgement.Good)
                 + " · Miss " + game.Taps.Count(t => t.Judgement == Judgement.Miss) + " · 최대 콤보 " + game.MaxCombo, 36);
             UiKit.Label("Label_Reward", col, "보석 +" + gems, 52, UiKit.TextColor);
-            UiKit.Label("Label_Replay", col, "리플레이: " + string.Join(",", game.Taps.Select(t => t.Time.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture))),
-                22, UiKit.Muted, TextAnchor.MiddleCenter, 90);
+            var taps = string.Join(",", game.Taps.Select(t => t.Time.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture)));
+            UiKit.Label("Label_Replay", col, "리플레이: " + taps, 22, UiKit.Muted, TextAnchor.MiddleCenter, 90);
+            Debug.Log("[MiniGameReplay] 점수 " + game.Score + " · qa minigame-replay --taps " + taps);
             UiKit.Button("Btn_Again", col, "한 판 더", ShowMiniGame);
             UiKit.Button("Btn_Back", col, "홈으로", ShowHome, UiKit.Panel);
         }

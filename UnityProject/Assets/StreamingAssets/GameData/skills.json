@@ -1,0 +1,16 @@
+[
+  { "Id": "s_pinecone_toss", "Name": "솔방울 던지기", "Target": "SingleEnemy", "Power": 140, "Cooldown": 2, "Status": "None" },
+  { "Id": "s_spore_cloud",   "Name": "포자 구름",     "Target": "AllEnemies",  "Power": 50,  "Cooldown": 3, "Status": "Poison", "StatusTurns": 3, "StatusPower": 20, "StatusChance": 100 },
+  { "Id": "s_lullaby",       "Name": "자장가 가락",   "Target": "SingleEnemy", "Power": 80,  "Cooldown": 3, "Status": "Stun", "StatusTurns": 1, "StatusChance": 60 },
+  { "Id": "s_light_rain",    "Name": "빛화살 비",     "Target": "AllEnemies",  "Power": 75,  "Cooldown": 3, "Status": "None" },
+  { "Id": "s_mushroom_soup", "Name": "버섯 수프",     "Target": "SingleAlly",  "Power": 250, "Cooldown": 2, "Status": "None" },
+  { "Id": "s_stone_shove",   "Name": "돌벽 밀치기",   "Target": "SingleEnemy", "Power": 110, "Cooldown": 4, "Status": "Stun", "StatusTurns": 1, "StatusChance": 100 },
+  { "Id": "s_moon_halo",     "Name": "달무리 폭발",   "Target": "AllEnemies",  "Power": 120, "Cooldown": 3, "Status": "None" },
+  { "Id": "s_whirl_slash",   "Name": "회오리 베기",   "Target": "SingleEnemy", "Power": 220, "Cooldown": 2, "Status": "None" },
+  { "Id": "s_dawn_prayer",   "Name": "새벽의 기도",   "Target": "AllAllies",   "Power": 150, "Cooldown": 4, "Status": "None" },
+
+  { "Id": "e_venom_bite",    "Name": "독니",          "Target": "SingleEnemy", "Power": 90,  "Cooldown": 2, "Status": "Poison", "StatusTurns": 3, "StatusPower": 18, "StatusChance": 100 },
+  { "Id": "e_shell_slam",    "Name": "등껍질 박치기", "Target": "SingleEnemy", "Power": 150, "Cooldown": 3, "Status": "Stun", "StatusTurns": 1, "StatusChance": 50 },
+  { "Id": "e_root_quake",    "Name": "뿌리 흔들기",   "Target": "AllEnemies",  "Power": 80,  "Cooldown": 3, "Status": "None" },
+  { "Id": "e_sap_heal",      "Name": "수액 치유",     "Target": "SingleAlly",  "Power": 200, "Cooldown": 3, "Status": "None" }
+]

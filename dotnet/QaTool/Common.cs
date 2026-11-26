@@ -25,6 +25,14 @@ public sealed class Options
     public string Get(string key, string fallback) => Get(key) ?? fallback;
     public string Require(string key) => Get(key) ?? throw new OptionException("--" + key + " 옵션이 필요합니다.");
 
+    /// <summary>시드용: 게임이 쓰는 시드는 ulong 전체 범위(long 최대값보다 큰 값 포함)다.</summary>
+    public ulong GetULong(string key, ulong fallback)
+    {
+        var v = Get(key);
+        if (v == null) return fallback;
+        return ulong.TryParse(v.Replace("_", ""), out var n) ? n : throw new OptionException("--" + key + " 는 0 이상의 정수여야 합니다: " + v);
+    }
+
     public long GetLong(string key, long fallback)
     {
         var v = Get(key);

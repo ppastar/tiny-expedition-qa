@@ -34,6 +34,8 @@ namespace TinyExpedition.Core.Data
             ValidateCharacters(db, issues);
             ValidateBanners(db, issues);
             ValidateStages(db, issues);
+            ValidateSkills(db, issues);
+            ValidateTurnStages(db, issues);
             return issues;
         }
 
@@ -53,6 +55,8 @@ namespace TinyExpedition.Core.Data
                 CheckRange(issues, T, c.Id, "def", c.Def, 0, MaxStat);
                 CheckRange(issues, T, c.Id, "spd", c.Spd, 1, 999);
                 CheckRange(issues, T, c.Id, "critRate", c.CritRate, 0, 100);
+                if (c.SkillId != null && !db.HasSkill(c.SkillId))
+                    issues.Add(Err(T, c.Id, "없는 스킬을 참조합니다: " + c.SkillId));
             }
         }
 
@@ -134,28 +138,101 @@ namespace TinyExpedition.Core.Data
                 }
             }
 
-            var byId = db.Stages.GroupBy(s => s.Id).ToDictionary(g => g.Key, g => g.First());
-            if (db.Stages.Count > 0 && db.Stages.All(s => s.RequiresStageId != null))
+            CheckUnlockChain(issues, T, db.Stages.Select(s => new KeyValuePair<string, string>(s.Id, s.RequiresStageId)).ToList());
+        }
+
+        /// <summary>선행 스테이지 관계 검사: 처음부터 열린 스테이지, 없는 선행, 순환(순환에 걸린 스테이지는 영원히 열리지 않는다).</summary>
+        private static void CheckUnlockChain(List<DataIssue> issues, string T, List<KeyValuePair<string, string>> stages)
+        {
+            var requires = new Dictionary<string, string>();
+            foreach (var kv in stages)
+                if (!requires.ContainsKey(kv.Key)) requires[kv.Key] = kv.Value;
+            if (stages.Count > 0 && stages.All(s => s.Value != null))
                 issues.Add(Err(T, "-", "처음부터 열려 있는 스테이지가 없습니다."));
 
-            foreach (var s in db.Stages)
+            foreach (var kv in stages)
             {
-                if (s.RequiresStageId != null && !byId.ContainsKey(s.RequiresStageId))
-                    issues.Add(Err(T, s.Id, "선행 스테이지가 없습니다: " + s.RequiresStageId));
+                if (kv.Value != null && !requires.ContainsKey(kv.Value))
+                    issues.Add(Err(T, kv.Key, "선행 스테이지가 없습니다: " + kv.Value));
 
-                // 선행 관계 순환: 순환에 걸린 스테이지는 영원히 열리지 않는다.
                 var seen = new HashSet<string>();
-                var cur = s;
-                while (cur != null && cur.RequiresStageId != null)
+                string cur = kv.Key;
+                while (cur != null && requires.TryGetValue(cur, out var next) && next != null)
                 {
-                    if (!seen.Add(cur.Id))
+                    if (!seen.Add(cur))
                     {
-                        issues.Add(Err(T, s.Id, "선행 스테이지가 순환합니다."));
+                        issues.Add(Err(T, kv.Key, "선행 스테이지가 순환합니다."));
                         break;
                     }
-                    byId.TryGetValue(cur.RequiresStageId, out cur);
+                    cur = next;
                 }
             }
+        }
+
+        public const int MaxSkillPower = 1000;
+        public const int MaxCooldown = 9;
+        public const int MaxStatusTurns = 5;
+        public const int MaxWaves = 5;
+        public const int MaxEnemiesPerWave = 3;
+
+        private static void ValidateSkills(GameDatabase db, List<DataIssue> issues)
+        {
+            const string T = "skills";
+            foreach (var dup in db.Skills.GroupBy(s => s.Id).Where(g => g.Count() > 1))
+                issues.Add(Err(T, dup.Key, "id가 중복됩니다."));
+
+            foreach (var s in db.Skills)
+            {
+                if (string.IsNullOrWhiteSpace(s.Id)) issues.Add(Err(T, "(빈 id)", "id가 비어 있습니다."));
+                if (string.IsNullOrWhiteSpace(s.Name)) issues.Add(Err(T, s.Id, "이름이 비어 있습니다."));
+                if (!Enum.IsDefined(typeof(SkillTarget), s.Target)) issues.Add(Err(T, s.Id, "알 수 없는 대상: " + (int)s.Target));
+                if (!Enum.IsDefined(typeof(StatusKind), s.Status)) issues.Add(Err(T, s.Id, "알 수 없는 상태이상: " + (int)s.Status));
+                CheckRange(issues, T, s.Id, "power", s.Power, 1, MaxSkillPower);
+                CheckRange(issues, T, s.Id, "cooldown", s.Cooldown, 0, MaxCooldown);
+                if (s.Status != StatusKind.None)
+                {
+                    if (!s.TargetsEnemies) issues.Add(Err(T, s.Id, "자기편 대상(회복) 스킬에는 상태이상을 붙일 수 없습니다."));
+                    CheckRange(issues, T, s.Id, "statusTurns", s.StatusTurns, 1, MaxStatusTurns);
+                    CheckRange(issues, T, s.Id, "statusChance", s.StatusChance, 1, 100);
+                    if (s.Status == StatusKind.Poison) CheckRange(issues, T, s.Id, "statusPower", s.StatusPower, 1, MaxStat);
+                }
+                else if (s.StatusTurns != 0 || s.StatusPower != 0)
+                {
+                    issues.Add(new DataIssue(IssueLevel.Warning, T, s.Id, "상태이상이 None인데 statusTurns/statusPower 값이 있습니다."));
+                }
+            }
+        }
+
+        private static void ValidateTurnStages(GameDatabase db, List<DataIssue> issues)
+        {
+            const string T = "turn-stages";
+            foreach (var dup in db.TurnStages.GroupBy(s => s.Id).Where(g => g.Count() > 1))
+                issues.Add(Err(T, dup.Key, "id가 중복됩니다."));
+
+            foreach (var s in db.TurnStages)
+            {
+                if (string.IsNullOrWhiteSpace(s.Name)) issues.Add(Err(T, s.Id, "이름이 비어 있습니다."));
+                if (s.Waves.Count == 0) issues.Add(Err(T, s.Id, "웨이브가 없습니다."));
+                if (s.Waves.Count > MaxWaves) issues.Add(Err(T, s.Id, "웨이브는 최대 " + MaxWaves + "개입니다."));
+                if (s.FirstClearGems < 0 || s.ClearGems < 0) issues.Add(Err(T, s.Id, "보상이 음수입니다."));
+                for (int w = 0; w < s.Waves.Count; w++)
+                {
+                    var enemies = s.Waves[w].Enemies;
+                    if (enemies.Count == 0) issues.Add(Err(T, s.Id, "웨이브 " + (w + 1) + "에 적이 없습니다."));
+                    if (enemies.Count > MaxEnemiesPerWave) issues.Add(Err(T, s.Id, "웨이브 " + (w + 1) + "의 적은 최대 " + MaxEnemiesPerWave + "마리입니다."));
+                    foreach (var e in enemies)
+                    {
+                        var f = "w" + (w + 1) + "." + e.Name;
+                        CheckRange(issues, T, s.Id, f + ".hp", e.Hp, 1, MaxStat);
+                        CheckRange(issues, T, s.Id, f + ".atk", e.Atk, 0, MaxStat);
+                        CheckRange(issues, T, s.Id, f + ".def", e.Def, 0, MaxStat);
+                        CheckRange(issues, T, s.Id, f + ".spd", e.Spd, 1, 999);
+                        if (e.SkillId != null && !db.HasSkill(e.SkillId))
+                            issues.Add(Err(T, s.Id, f + "이(가) 없는 스킬을 참조합니다: " + e.SkillId));
+                    }
+                }
+            }
+            CheckUnlockChain(issues, T, db.TurnStages.Select(s => new KeyValuePair<string, string>(s.Id, s.RequiresStageId)).ToList());
         }
 
         private static DataIssue Err(string table, string id, string message) =>

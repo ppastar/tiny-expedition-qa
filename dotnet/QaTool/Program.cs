@@ -18,6 +18,7 @@ try
         "gacha-verify" => GachaVerifyCommand.Run(opts),
         "battle-replay" => BattleReplayCommand.Run(opts),
         "minigame-replay" => MiniGameReplayCommand.Run(opts),
+        "turn-replay" => TurnReplayCommand.Run(opts),
         "report" => ReportCommand.Run(opts),
         _ => Unknown(args[0]),
     };
@@ -49,6 +50,10 @@ static void PrintHelp()
 
           battle-replay   --stage <id> --party <id,id,id> [--seed 1] [--data <dir>]
               시드로 전투를 다시 돌려 행동 로그 출력 (버그 리포트 재현용).
+
+          turn-replay     --stage <id> --party <id,id,id> [--seed 1] [--commands A0,S1,G,...] [--auto true|false] [--data <dir>]
+              턴제 전투를 시드 + 아군 명령 목록으로 다시 돌려 로그 출력. 명령을 안 주면 자동 전투,
+              명령이 모자라면 --auto true(기본)면 나머지를 자동으로, false면 그 자리에서 멈춘다.
 
           minigame-replay --taps <t1,t2,...>
               미니게임 탭 시각 기록으로 판정·점수를 다시 계산.
