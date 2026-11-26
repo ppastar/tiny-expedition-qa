@@ -1,0 +1,6 @@
+[
+  { "Id": "s_ok",        "Name": "멀쩡한 스킬",  "Target": "SingleEnemy", "Power": 120, "Cooldown": 2, "Status": "None" },
+  { "Id": "s_cd_typo",   "Name": "쿨타임 오타",  "Target": "AllEnemies",  "Power": 80,  "Cooldown": 30, "Status": "None" },
+  { "Id": "s_heal_stun", "Name": "기절 거는 회복", "Target": "SingleAlly", "Power": 150, "Cooldown": 2, "Status": "Stun", "StatusTurns": 1 },
+  { "Id": "s_weak_poison", "Name": "피해 없는 독", "Target": "SingleEnemy", "Power": 90, "Cooldown": 2, "Status": "Poison", "StatusTurns": 3, "StatusPower": 0 }
+]

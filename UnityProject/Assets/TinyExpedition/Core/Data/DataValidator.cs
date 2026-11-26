@@ -57,8 +57,6 @@ namespace TinyExpedition.Core.Data
                 CheckRange(issues, T, c.Id, "critRate", c.CritRate, 0, 100);
                 if (c.SkillId != null && !db.HasSkill(c.SkillId))
                     issues.Add(Err(T, c.Id, "없는 스킬을 참조합니다: " + c.SkillId));
-                else if (c.SkillId == null && db.Skills.Count > 0)
-                    issues.Add(new DataIssue(IssueLevel.Warning, T, c.Id, "턴제 스킬이 없습니다 (공격·방어만 가능)."));
             }
         }
 
@@ -216,7 +214,7 @@ namespace TinyExpedition.Core.Data
                 if (string.IsNullOrWhiteSpace(s.Name)) issues.Add(Err(T, s.Id, "이름이 비어 있습니다."));
                 if (s.Waves.Count == 0) issues.Add(Err(T, s.Id, "웨이브가 없습니다."));
                 if (s.Waves.Count > MaxWaves) issues.Add(Err(T, s.Id, "웨이브는 최대 " + MaxWaves + "개입니다."));
-                if (s.FirstClearGems < 0) issues.Add(Err(T, s.Id, "보상이 음수입니다."));
+                if (s.FirstClearGems < 0 || s.ClearGems < 0) issues.Add(Err(T, s.Id, "보상이 음수입니다."));
                 for (int w = 0; w < s.Waves.Count; w++)
                 {
                     var enemies = s.Waves[w].Enemies;

@@ -10,7 +10,10 @@ namespace TinyExpedition.Core.Data
         /// <summary>먼저 깨야 하는 턴제 스테이지. 첫 스테이지는 null.</summary>
         public string RequiresStageId { get; set; }
         public List<WaveDef> Waves { get; set; } = new List<WaveDef>();
+        /// <summary>첫 클리어 때 한 번만 주는 보석.</summary>
         public int FirstClearGems { get; set; }
+        /// <summary>이길 때마다 주는 보석 (반복 보상).</summary>
+        public int ClearGems { get; set; }
     }
 
     public sealed class WaveDef

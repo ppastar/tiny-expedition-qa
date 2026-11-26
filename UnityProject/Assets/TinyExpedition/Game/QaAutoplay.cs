@@ -10,7 +10,7 @@ namespace TinyExpedition.Game
     /// <summary>
     /// 개발 빌드 전용 자동 플레이(빌드 스모크 테스트).
     /// 실행: TinyExpedition.exe -qaAutoplay &lt;결과 폴더&gt;
-    /// 홈 → 10연 모집 → 보유 캐릭터 → 원정 1-1 전투 → 미니게임 한 판을 실제 빌드에서 진행하고
+    /// 홈 → 10연 모집 → 보유 캐릭터 → 원정 1-1 전투 → 미니게임 한 판 → 턴제 T-1 전투를 실제 빌드에서 진행하고
     /// 단계마다 스크린샷을 남긴 뒤 종료한다. 실패하면 종료 코드 1.
     /// 출시 빌드에는 컴파일되지 않는다.
     /// </summary>
@@ -129,6 +129,32 @@ namespace TinyExpedition.Game
             yield return Wait(0.5f);
             Expect(_app.CurrentScreen == "MiniGameResult", "미니게임 결과 화면");
             yield return Shot("minigame-result");
+
+            // 턴제 전투: 대상을 골라 직접 한 번 공격하고, 나머지는 자동으로 끝까지
+            Click("Btn_Back");
+            yield return Wait(0.3f);
+            Click("Btn_TurnBattle");
+            yield return Wait(0.3f);
+            Expect(_app.CurrentScreen == "TurnStages", "턴제 스테이지 화면");
+            yield return Shot("turn-stages");
+            Click("Btn_TurnStage_T-1");
+            yield return Wait(0.5f);
+            Expect(_app.CurrentScreen == "TurnBattle", "턴제 전투 화면");
+            yield return Shot("turn-battle");
+            Click("Btn_Target_1");
+            yield return Wait(0.2f);
+            Click("Btn_Attack");
+            yield return Wait(0.5f);
+            Expect(_app.CurrentTurnBattle.Commands.Count == 1, "턴제 명령 1개 기록");
+            if (_app.CurrentScreen == "TurnBattle")
+            {
+                yield return Shot("turn-battle-after-attack");
+                Click("Btn_AutoAll");
+                yield return Wait(0.5f);
+            }
+            Expect(_app.CurrentScreen == "TurnResult", "턴제 결과 화면");
+            Log("턴제 결과 " + _app.CurrentTurnBattle.Outcome + " · 시드 " + _app.CurrentTurnBattle.Seed);
+            yield return Shot("turn-result");
         }
 
         private void Click(string name)

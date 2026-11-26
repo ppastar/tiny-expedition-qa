@@ -28,7 +28,7 @@ namespace TinyExpedition.Tests
         public static TurnStageDef Stage(string id, string requires, int gems, params TurnEnemyDef[][] waves) =>
             new TurnStageDef
             {
-                Id = id, Name = id, RequiresStageId = requires, FirstClearGems = gems,
+                Id = id, Name = id, RequiresStageId = requires, FirstClearGems = gems, ClearGems = gems / 10,
                 Waves = waves.Select(w => new WaveDef { Enemies = w.ToList() }).ToList(),
             };
 
@@ -354,13 +354,15 @@ namespace TinyExpedition.Tests
             battle.RunAuto();
             Assert.That(battle.Outcome, Is.EqualTo(TurnOutcome.Victory));
 
-            Assert.That(s.ClaimTurnBattle(battle), Is.EqualTo(100));
+            Assert.That(s.ClaimTurnBattle(battle), Is.EqualTo(110), "첫 클리어 100 + 클리어 10");
             Assert.That(s.ClaimTurnBattle(battle), Is.EqualTo(0), "같은 전투 두 번째 수령");
-            Assert.That(s.State.Gems, Is.EqualTo(100));
+            Assert.That(s.State.Gems, Is.EqualTo(110));
 
             var again = s.StartTurnBattle("t1", new[] { "hero" }).Value;
             again.RunAuto();
-            Assert.That(s.ClaimTurnBattle(again), Is.EqualTo(0), "첫 클리어 보상은 한 번만");
+            Assert.That(s.ClaimTurnBattle(again), Is.EqualTo(10), "첫 클리어 보상은 한 번만, 클리어 보상은 매번");
+            Assert.That(s.ClaimTurnBattle(again), Is.EqualTo(0));
+            Assert.That(s.State.Gems, Is.EqualTo(120));
 
             var forged = new TurnBattle(new[] { s.Db.GetCharacter("hero") }, s.Db.GetTurnStage("t1"), s.Db, 1);
             forged.RunAuto();
@@ -369,7 +371,7 @@ namespace TinyExpedition.Tests
             var otherBattle = other.StartTurnBattle("t1", new[] { "hero" }).Value;
             otherBattle.RunAuto();
             Assert.That(s.ClaimTurnBattle(otherBattle), Is.EqualTo(0), "다른 세션의 전투는 보상 없음");
-            Assert.That(s.State.Gems, Is.EqualTo(100));
+            Assert.That(s.State.Gems, Is.EqualTo(120));
         }
 
         [Test, TC("TURN-015")]
@@ -407,7 +409,7 @@ namespace TinyExpedition.Tests
             Assert.That((win.Outcome, win.Stars), Is.EqualTo((TurnOutcome.Victory, 1)), "전제: 별 1 승리");
             s2.ClaimTurnBattle(win);
             Assert.That(s2.State.ClearedTurnStages["t1"], Is.EqualTo(3), "더 낮은 별로 덮어쓰지 않음");
-            Assert.That(s2.State.Gems, Is.EqualTo(0), "이미 깬 스테이지라 보석 없음");
+            Assert.That(s2.State.Gems, Is.EqualTo(10), "이미 깬 스테이지라 클리어 보상(10)만");
         }
 
         [Test, TC("TURN-019")]

@@ -128,5 +128,67 @@ namespace TinyExpedition.Tests.PlayMode
             Assert.That(_app.Skins.MissingCount, Is.GreaterThan(0));
             LogAssert.NoUnexpectedReceived();
         }
+
+        /// <summary>모집으로 파티를 만들고 턴제 T-1 전투 화면까지 들어간다.</summary>
+        private IEnumerator EnterTurnBattle()
+        {
+            Launch();
+            yield return null;
+            Btn("Btn_Pull10").onClick.Invoke();
+            yield return null;
+            Btn("Btn_Back").onClick.Invoke();
+            yield return null;
+            Btn("Btn_TurnBattle").onClick.Invoke();
+            yield return null;
+            Assert.That(_app.CurrentScreen, Is.EqualTo("TurnStages"));
+            Assert.That(Btn("Btn_TurnStage_T-2").interactable, Is.False, "T-1을 깨기 전에는 T-2 잠김");
+            Btn("Btn_TurnStage_T-1").onClick.Invoke();
+            yield return null;
+            Assert.That(_app.CurrentScreen, Is.EqualTo("TurnBattle"));
+        }
+
+        [UnityTest, Property("TC", "TURN-023")]
+        public IEnumerator TurnBattle_TargetAttack_ThenAuto_ShowsResultAndReward()
+        {
+            yield return EnterTurnBattle();
+            var battle = _app.CurrentTurnBattle;
+            Assert.That(battle.CurrentActor, Is.Not.Null);
+            int gemsBefore = _app.Session.State.Gems;
+
+            // 두 번째 적을 골라 공격 → 명령 기록에 대상 1번이 남고 다음 차례로 넘어간다
+            Btn("Btn_Target_1").onClick.Invoke();
+            yield return null;
+            Assert.That(LabelText("Label_Prompt"), Does.Contain(battle.Enemies[1].Name));
+            int logBefore = battle.Log.Count;
+            Btn("Btn_Attack").onClick.Invoke();
+            yield return null;
+            Assert.That(battle.Commands.Select(c => c.ToString()), Is.EqualTo(new[] { "A1" }));
+            Assert.That(battle.Log.Count, Is.GreaterThan(logBefore));
+
+            Btn("Btn_AutoAll").onClick.Invoke();
+            yield return null;
+            Assert.That(_app.CurrentScreen, Is.EqualTo("TurnResult"));
+            Assert.That(battle.IsOver && battle.RewardClaimed, Is.True);
+            int gained = _app.Session.State.Gems - gemsBefore;
+            Assert.That(LabelText("Label_Reward"), Is.EqualTo("보석 +" + gained));
+            if (battle.Outcome == TinyExpedition.Core.Battle.TurnOutcome.Victory)
+                Assert.That(gained, Is.EqualTo(165), "T-1 첫 클리어 150 + 클리어 15");
+            Assert.That(LabelText("Label_Replay"), Does.Contain("--seed " + battle.Seed).And.Contain("--commands A1,"));
+        }
+
+        [UnityTest, Property("TC", "TURN-024")]
+        public IEnumerator TurnBattle_Retreat_GivesNoReward()
+        {
+            yield return EnterTurnBattle();
+            int gemsBefore = _app.Session.State.Gems;
+            Btn("Btn_Guard").onClick.Invoke();
+            yield return null;
+            Btn("Btn_Retreat").onClick.Invoke();
+            yield return null;
+            Assert.That(_app.CurrentScreen, Is.EqualTo("Home"));
+            Assert.That(_app.Session.State.Gems, Is.EqualTo(gemsBefore));
+            Assert.That(_app.Session.State.ClearedTurnStages, Is.Empty);
+            Assert.That(_app.CurrentTurnBattle, Is.Null);
+        }
     }
 }

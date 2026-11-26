@@ -27,8 +27,9 @@ namespace TinyExpedition.Game
     /// <summary>
     /// 게임 화면 전체. 규칙은 전부 Core의 GameSession에 있고, 여기서는 보여주고 입력만 넘긴다.
     /// UI 요소 이름(Btn_*, Label_*)은 PlayMode 테스트가 찾는 계약이므로 바꾸면 테스트도 같이 바꾼다.
+    /// 턴제 전투 화면은 GameApp.TurnBattle.cs에 있다.
     /// </summary>
-    public sealed class GameApp : MonoBehaviour
+    public sealed partial class GameApp : MonoBehaviour
     {
         public const string MainBannerId = "b_lumi";
 
@@ -148,6 +149,7 @@ namespace TinyExpedition.Game
             UiKit.Button("Btn_Pull1", col, "1회 모집 (" + banner.CostPerPull + ")", () => DoPull(1));
             UiKit.Button("Btn_Pull10", col, "10회 모집 (" + banner.CostPerPull * 10 + ")", () => DoPull(10));
             UiKit.Button("Btn_Stages", col, "원정 떠나기", ShowStages, UiKit.Panel);
+            UiKit.Button("Btn_TurnBattle", col, "턴제 전투: 동굴 탐험", ShowTurnStages, UiKit.Panel);
             UiKit.Button("Btn_MiniGame", col, "미니게임: 별빛 타이밍", ShowMiniGame, UiKit.Panel);
             UiKit.Button("Btn_Roster", col, "보유 캐릭터 (" + Session.State.Owned.Count + ")", ShowRoster, UiKit.Panel);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD

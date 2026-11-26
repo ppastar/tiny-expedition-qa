@@ -19,7 +19,7 @@ QA로 일을 시작해 SDET·플랫폼 엔지니어로 넘어온 경험을 게�
 
 | 항목 | 내용 |
 |---|---|
-| 게임 | Unity 6 (6000.5) · uGUI를 코드로 구성 · 모집 / 원정(자동 전투) / 미니게임 "별빛 타이밍" / QA 디버그 패널 |
+| 게임 | Unity 6 (6000.5) · uGUI를 코드로 구성 · 모집 / 원정(자동 전투) / **턴제 전투**(속도 순서·스킬 쿨타임·기절/독·3웨이브) / 미니게임 "별빛 타이밍" / QA 디버그 패널 |
 | TC 문서 | [`docs/test-cases.csv`](docs/test-cases.csv) — 64개 (자동화 62 · 수동 2), 영역·우선순위·유형·실행 환경 포함 |
 | 테스트 계획 | [`docs/TEST_PLAN.md`](docs/TEST_PLAN.md) — 위험별 대응, TC 작성 기준, 릴리스 기준, 개발 단계(프로토타입 → 알파 → CBT → 출시 → 라이브)별 범위·진입/종료 기준·산출물 |
 | 체크리스트 | [`docs/checklists/`](docs/checklists/) — 빌드 스모크 12항목(10~15분) · 아웃게임 릴리즈 30항목, 구글 시트로 가져갈 수 있는 CSV, 항목마다 관련 TC |
@@ -27,7 +27,7 @@ QA로 일을 시작해 SDET·플랫폼 엔지니어로 넘어온 경험을 게�
 | 기획 리뷰 | [`docs/spec-review/gacha.md`](docs/spec-review/gacha.md) — 모집·천장 규칙 11개 정리, 질문 13개·리스크·TC 연결 (리뷰 중 실제 결함 1건 발견·수정) |
 | 자동화 테스트 | NUnit 77개 — dotnet과 Unity EditMode에서 같은 소스로 실행, 둘 다 통과 / Unity PlayMode UI 테스트 4개 통과 / 실제 빌드 자동 플레이 스모크 |
 | 커버리지 | 게임 규칙(Core) 라인 92.7% · 화면(Game) 58.9% — Unity Code Coverage ([요약](docs/reports/coverage-summary.md)) |
-| QA 도구 | `qa-tool` CLI — 데이터 검사 · 확률 검증 · 전투/미니게임 리플레이 · TC 추적 리포트 / 뮤테이션 스모크 20/20 · 빌드 자동 플레이(`-qaAutoplay`) · Unity 에디터 메뉴·빌드 전 데이터 검사 훅 |
+| QA 도구 | `qa-tool` CLI — 데이터 검사 · 확률 검증 · 전투/턴제/미니게임 리플레이 · TC 추적 리포트 / 뮤테이션 스모크 20/20 · 빌드 자동 플레이(`-qaAutoplay`) · Unity 에디터 메뉴·빌드 전 데이터 검사 훅 |
 | CI | GitHub Actions — 테스트·데이터 검사·확률 검증(배너당 100만 회)·추적 리포트를 push·PR마다, 뮤테이션 스모크를 PR·수동 실행 때 돌림 (Ubuntu에서 통과 확인) |
 
 ## 구조
@@ -39,7 +39,7 @@ UnityProject/Assets/
       Random/          PCG32 시드 난수 (런타임이 달라도 같은 수열)
       Data/            기획 데이터 로더 + DataValidator
       Gacha/           모집·천장·10연 보정, 천장 포함 실제 확률 계산
-      Battle/          결정적 자동 전투 시뮬레이터
+      Battle/          결정적 자동 전투 시뮬레이터 + 턴제 전투(시드 + 명령 목록으로 리플레이)
       MiniGame/        타이밍 탭 판정·콤보·리플레이
       Progress/        세이브 직렬화·변조 검사
       GameSession.cs   UI와 테스트가 함께 쓰는 입구
@@ -47,7 +47,7 @@ UnityProject/Assets/
     Editor/          ← 에디터 메뉴, 빌드 전 데이터 검사 훅, CI용 진입점
     Tests/Shared/    ← NUnit 테스트 (Unity EditMode와 dotnet test가 같은 파일을 컴파일)
     Tests/PlayMode/  ← 실제 화면을 띄워 버튼을 누르는 UI 테스트
-  StreamingAssets/GameData/   characters.json · banners.json · stages.json
+  StreamingAssets/GameData/   characters.json · banners.json · stages.json · skills.json · turn-stages.json
 dotnet/              ← Core·테스트를 Unity 없이 빌드하는 프로젝트 + qa-tool
 docs/                ← TC 문서, 테스트 계획
   checklists/          빌드 스모크·아웃게임 릴리즈 체크리스트 (CSV)
@@ -75,9 +75,9 @@ scripts/             ← 전체 파이프라인, Unity 테스트 실행, 뮤테�
 | 규칙 단위 테스트 | 모집·천장·전투 공식·판정 경계·세이브 | dotnet + Unity EditMode | 77 |
 | 통계 테스트 | 등급 분포(카이제곱), 픽업 비율(천장 3성 포함), 천장 포함 실제 확률 | 위와 같음 (시드 고정이라 흔들리지 않음) | 4 (위 77에 포함) |
 | 데이터 테스트 | 실제 테이블 검사 + 잘못된 테이블을 잡는지 | 위와 같음 + Unity 빌드 훅 | 10 (위 77에 포함) |
-| UI E2E | 부팅 → 모집 → 결과, 미니게임 한 판, 그림 누락 | Unity PlayMode | 4 |
-| 빌드 스모크 | 실제 Windows 개발 빌드가 홈→모집→전투→미니게임을 스스로 진행, 단계별 스크린샷 | `TinyExpedition.exe -qaAutoplay <폴더>` | 1 흐름 |
-| 수동 탐색 | 실기기 터치 지연, 화면 비율 | 사람 | 2 |
+| UI E2E | 부팅 → 모집 → 결과, 미니게임 한 판, 그림 누락, 턴제 대상 선택·공격·자동·보상, 턴제 후퇴 | Unity PlayMode | 4 |
+| 빌드 스모크 | 실제 Windows 개발 빌드가 홈→모집→전투→미니게임→턴제 전투를 스스로 진행, 단계별 스크린샷 | `TinyExpedition.exe -qaAutoplay <폴더>` | 1 흐름 |
+| 수동 탐색 | 실기기 터치 지연, 화면 비율, 턴제 템포·가독성 | 사람 | 2 |
 
 TC 문서의 모든 자동화 TC는 테스트 코드에 `[TC("GACHA-004")]`처럼 번호가 붙어 있어,
 리포트 도구가 **TC 문서 ↔ 테스트 ↔ 결과**를 자동으로 잇습니다. 문서에만 있고 테스트가 없는 TC, 테스트에만 있고 문서에 없는 번호는 리포트에서 실패로 잡힙니다.
@@ -142,6 +142,23 @@ $ qa battle-replay --stage 1-3 --party c_lumi,c_firefly,c_moss --seed 5
 $ qa minigame-replay --taps 0.41,1.93,2.77,3.6,4.42,5.55,6.01,7.2,8.39,9.0
 ```
 
+턴제 전투는 사람이 명령을 고르므로 **시드 + 아군 명령 목록**이 리플레이 단위입니다(`A1` = 1번 적 공격, `S0` = 스킬(대상 0번), `G` = 방어).
+전투 결과 화면에 이 명령줄이 그대로 찍혀, 복사해 붙이면 같은 전투가 다시 나옵니다. 명령이 모자라면 `--auto false`로 그 자리에서 멈춰 "이 차례에서 무엇이 보였는지"를 확인할 수 있습니다.
+
+```
+$ qa turn-replay --stage T-1 --party c_kai,c_firefly,c_acorn --seed 3 --commands A1,S0,G
+  W1 R1 회오리 검사 카이 → 동굴 박쥐 102(치명) [남은 HP 158]
+  ...
+  W2 R5 독거미 [독니] → 반딧불 궁수 32 [남은 HP 400]
+  W2 R5 반딧불 궁수 독 1중첩 (3라운드)
+  ...
+결과: Victory · 웨이브 3/3 · 10라운드 · 별 3
+명령: A1,S0,G,...
+```
+
+턴제 규칙(행동 순서 동점 처리, 쿨타임이 줄어드는 시점, 기절·독 중첩, 웨이브 전환, 동시 전멸 = 패배)은
+[`TurnBattle.cs`](UnityProject/Assets/TinyExpedition/Core/Battle/TurnBattle.cs) 맨 위 주석에 기획서처럼 적어 두고, 경계마다 TC(TURN-001~024)를 붙였습니다.
+
 ### 4. TC 추적 리포트 `qa report`
 
 dotnet과 Unity가 내는 NUnit XML을 TC 문서와 이어 HTML 리포트를 만듭니다.
@@ -176,7 +193,7 @@ $ qa report --results dotnet=artifacts/dotnet-results.xml,unity-playmode=artifac
 
 ### 7. 빌드 자동 플레이 `-qaAutoplay`
 
-개발 빌드를 `TinyExpedition.exe -qaAutoplay <폴더>`로 실행하면 홈 → 10연 모집 → 보유 캐릭터 → 원정 1-1 → 미니게임 한 판을 스스로 진행하며 각 화면을 확인(화면 이름·버튼 활성)하고 스크린샷을 남긴 뒤 종료합니다. 하나라도 어긋나면 종료 코드 1. 미니게임은 실제 시간으로 막대를 보고 누르며, 일부러 4번째마다 빗나가게 해 Miss·콤보 초기화까지 지나갑니다.
+개발 빌드를 `TinyExpedition.exe -qaAutoplay <폴더>`로 실행하면 홈 → 10연 모집 → 보유 캐릭터 → 원정 1-1 → 미니게임 한 판 → 턴제 T-1(대상 골라 직접 공격 한 번 → 끝까지 자동)을 스스로 진행하며 각 화면을 확인(화면 이름·버튼 활성)하고 스크린샷을 남긴 뒤 종료합니다. 하나라도 어긋나면 종료 코드 1. 미니게임은 실제 시간으로 막대를 보고 누르며, 일부러 4번째마다 빗나가게 해 Miss·콤보 초기화까지 지나갑니다.
 
 ![자동 플레이 스크린샷](docs/reports/autoplay/contact-sheet.png)
 

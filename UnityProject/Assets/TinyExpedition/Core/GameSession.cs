@@ -159,7 +159,7 @@ namespace TinyExpedition.Core
         private readonly HashSet<TurnBattle> _turnBattles = new HashSet<TurnBattle>();
 
         /// <summary>
-        /// 끝난 턴제 전투의 보상(첫 클리어 보석)을 받고 별 기록을 남긴다. 받은 보석 수를 돌려준다.
+        /// 끝난 턴제 전투의 보상(이길 때마다 ClearGems + 첫 클리어면 FirstClearGems)을 받고 별 기록을 남긴다. 받은 보석 수를 돌려준다.
         /// 이 세션이 시작한 전투가 아니거나, 끝나지 않았거나, 이미 받은 전투는 0이고 상태를 바꾸지 않는다.
         /// </summary>
         public int ClaimTurnBattle(TurnBattle battle)
@@ -171,7 +171,7 @@ namespace TinyExpedition.Core
 
             var id = battle.Stage.Id;
             bool firstClear = !State.ClearedTurnStages.TryGetValue(id, out int prevStars);
-            int gems = firstClear ? battle.Stage.FirstClearGems : 0;
+            int gems = battle.Stage.ClearGems + (firstClear ? battle.Stage.FirstClearGems : 0);
             State.Gems += gems;
             if (battle.Stars > prevStars) State.ClearedTurnStages[id] = battle.Stars;
             return gems;
