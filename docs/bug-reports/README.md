@@ -8,6 +8,7 @@ Jira 이슈에 그대로 옮길 수 있는 양식으로 썼습니다. 한 파일
 |---|---|---|---|---|---|---|
 | [BUG-001](BUG-001-gems-taken-on-failed-pull.md) | **실제 결함** | 모집이 데이터 오류로 실패해도 보석이 먼저 빠지고 결과는 없음 | Critical | P0 | 수정됨 (4458613) | GACHA-015 |
 | [BUG-002](BUG-002-ten-pull-guarantee-without-two-star-pool.md) | **실제 결함** | 2성 확률 0% + 2성 후보 없음 배너가 데이터 검사를 통과하고, 10연 모집이 대부분 실패함 | Major | P1 | 수정됨 (PR #2) | DATA-010, GACHA-015 |
+| [BUG-003](BUG-003-replay-seed-above-long-max-rejected.md) | **실제 결함** | 게임이 찍어 준 시드가 long 최대값보다 크면 qa-tool이 거부해 리플레이를 못 함 (음수 시드는 다른 판을 돌림) | Major | P1 | 수정됨 (PR #4, ae98211) | TOOL-001 ~ TOOL-004 |
 | [DEMO-001](DEMO-001-pity-off-by-one.md) | 시연용 | 천장이 90번째가 아니라 91번째에 걸림 | Critical | P0 | 시연 | GACHA-004, GACHA-005, GACHA-011 |
 | [DEMO-002](DEMO-002-minigame-reward-double-claim.md) | 시연용 | 미니게임 같은 판 보상을 두 번 받을 수 있음 | Critical | P0 | 시연 | MINI-010 |
 | [DEMO-003](DEMO-003-perfect-boundary.md) | 시연용 | Perfect 판정 경계(중심 ±0.04)가 Good으로 판정됨 | Major | P0 | 시연 | MINI-002 |
@@ -38,7 +39,7 @@ Jira 이슈에 그대로 옮길 수 있는 양식으로 썼습니다. 한 파일
 | 심각도 | 기준 | 예 |
 |---|---|---|
 | Critical | 재화·확률·진행 데이터가 틀어짐, 크래시, 우회 불가 | 보석이 빠지고 결과 없음, 천장 미작동 |
-| Major | 기능이 기획과 다르게 동작하지만 진행은 가능, 또는 특정 데이터에서만 기능이 막힘 | 판정 경계 오류, 특정 배너 10연 불가 |
+| Major | 기능이 기획과 다르게 동작하지만 진행은 가능, 또는 특정 데이터에서만 기능이 막힘. 플레이어 피해는 없어도 QA 도구가 결함을 재현·검출하지 못하게 되는 경우 | 판정 경계 오류, 특정 배너 10연 불가, 리플레이 도구가 시드 절반을 거부 |
 | Minor | 표시·문구 오류, 쉽게 우회 가능 | 숫자 표기 오류 |
 | Trivial | 사용자에게 거의 영향 없음 | 로그 문구 오탈자 |
 

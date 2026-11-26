@@ -5,5 +5,8 @@
   <Folder Name="/Core/">
     <Project Path="Core/TinyExpedition.Core.csproj" />
   </Folder>
+  <Folder Name="/QaTool.Tests/">
+    <Project Path="QaTool.Tests/QaTool.Tests.csproj" />
+  </Folder>
   <Project Path="QaTool/QaTool.csproj" />
 </Solution>
