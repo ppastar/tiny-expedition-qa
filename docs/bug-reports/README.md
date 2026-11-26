@@ -7,7 +7,7 @@ Jira 이슈에 그대로 옮길 수 있는 양식으로 썼습니다. 한 파일
 | ID | 구분 | 요약 | 심각도 | 우선순위 | 상태 | 관련 TC |
 |---|---|---|---|---|---|---|
 | [BUG-001](BUG-001-gems-taken-on-failed-pull.md) | **실제 결함** | 모집이 데이터 오류로 실패해도 보석이 먼저 빠지고 결과는 없음 | Critical | P0 | 수정됨 (4458613) | GACHA-015 |
-| [BUG-002](BUG-002-ten-pull-guarantee-without-two-star-pool.md) | **실제 결함** | 2성 확률 0% + 2성 후보 없음 배너가 데이터 검사를 통과하고, 10연 모집이 대부분 실패함 | Major | P1 | 수정됨 (PR #__PR__) | DATA-010, GACHA-015 |
+| [BUG-002](BUG-002-ten-pull-guarantee-without-two-star-pool.md) | **실제 결함** | 2성 확률 0% + 2성 후보 없음 배너가 데이터 검사를 통과하고, 10연 모집이 대부분 실패함 | Major | P1 | 수정됨 (PR #2) | DATA-010, GACHA-015 |
 | [DEMO-001](DEMO-001-pity-off-by-one.md) | 시연용 | 천장이 90번째가 아니라 91번째에 걸림 | Critical | P0 | 시연 | GACHA-004, GACHA-005, GACHA-011 |
 | [DEMO-002](DEMO-002-minigame-reward-double-claim.md) | 시연용 | 미니게임 같은 판 보상을 두 번 받을 수 있음 | Critical | P0 | 시연 | MINI-010 |
 | [DEMO-003](DEMO-003-perfect-boundary.md) | 시연용 | Perfect 판정 경계(중심 ±0.04)가 Good으로 판정됨 | Major | P0 | 시연 | MINI-002 |

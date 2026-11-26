@@ -207,7 +207,7 @@ Unity에서 열 때는 Unity Hub에서 `UnityProject` 폴더를 추가하고, �
 버그 리포트 중 실제 결함은 두 건입니다.
 
 - [BUG-001](docs/bug-reports/BUG-001-gems-taken-on-failed-pull.md) 모집이 데이터 오류로 실패해도 보석이 먼저 빠짐 — 수정 전 커밋(15562c3)에서 10/10 재현, 4458613에서 수정, 회귀 TC GACHA-015.
-- [BUG-002](docs/bug-reports/BUG-002-ten-pull-guarantee-without-two-star-pool.md) "2성 0% + 2성 후보 없음 + 10연 보정" 배너가 데이터 검사를 통과하고 10연이 시드 100개 중 76개에서 실패 — 기획 리뷰 중 발견. 이 조합 때문에 BUG-001이 검사기를 통과하는 데이터로도 터질 수 있었음을 확인. PR #__PR__에서 검사기 규칙으로 수정(이 배너는 이제 Error), 회귀 TC DATA-010 · GACHA-015.
+- [BUG-002](docs/bug-reports/BUG-002-ten-pull-guarantee-without-two-star-pool.md) "2성 0% + 2성 후보 없음 + 10연 보정" 배너가 데이터 검사를 통과하고 10연이 시드 100개 중 76개에서 실패 — 기획 리뷰 중 발견. 이 조합 때문에 BUG-001이 검사기를 통과하는 데이터로도 터질 수 있었음을 확인. PR #2에서 검사기 규칙으로 수정(이 배너는 이제 Error), 회귀 TC DATA-010 · GACHA-015.
 
 나머지 3건(DEMO-001~003)은 뮤테이션 스모크용 결함을 일부러 넣고 재현한 **시연용**이며, 문서 맨 위에 그렇게 표시했습니다.
 
