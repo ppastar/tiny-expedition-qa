@@ -190,9 +190,15 @@ namespace TinyExpedition.Game
             UiKit.Label("Label_Reward", col, "보석 +" + gems, 52, UiKit.TextColor);
             UiKit.Label("Label_TurnLog", col, string.Join("\n", b.Log.Skip(System.Math.Max(0, b.Log.Count - 10)).Select(e => e.ToString())),
                 26, UiKit.Muted, TextAnchor.UpperLeft, 420);
-            UiKit.Label("Label_Replay", col, "리플레이: qa turn-replay --stage " + b.Stage.Id + " --party " + string.Join(",", _turnParty)
-                + " --seed " + b.Seed + " --commands " + string.Join(",", b.Commands), 22, UiKit.Muted, TextAnchor.MiddleCenter, 120);
+            UiKit.Label("Label_Replay", col, "리플레이: " + TurnReplayCommand(b), 22, UiKit.Muted, TextAnchor.MiddleCenter, 120);
+            // 화면 글자는 작아 옮겨 적다 틀리기 쉽다. 버그 리포트에는 Player.log의 이 줄을 그대로 붙인다.
+            Debug.Log("[TurnReplay] " + b.Outcome + " · " + TurnReplayCommand(b));
             UiKit.Button("Btn_Back", col, "확인", () => { _turn = null; ShowTurnStages(); });
         }
+
+        /// <summary>이 판을 그대로 다시 돌리는 qa-tool 명령줄.</summary>
+        public string TurnReplayCommand(TurnBattle b) =>
+            "qa turn-replay --stage " + b.Stage.Id + " --party " + string.Join(",", _turnParty)
+            + " --seed " + b.Seed + " --auto false --commands " + string.Join(",", b.Commands);
     }
 }

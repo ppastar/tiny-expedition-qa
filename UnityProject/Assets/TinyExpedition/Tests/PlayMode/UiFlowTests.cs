@@ -165,8 +165,12 @@ namespace TinyExpedition.Tests.PlayMode
             Assert.That(battle.Commands.Select(c => c.ToString()), Is.EqualTo(new[] { "A1" }));
             Assert.That(battle.Log.Count, Is.GreaterThan(logBefore));
 
+            var logs = new System.Collections.Generic.List<string>();
+            Application.LogCallback capture = (msg, stack, type) => logs.Add(msg);
+            Application.logMessageReceived += capture;
             Btn("Btn_AutoAll").onClick.Invoke();
             yield return null;
+            Application.logMessageReceived -= capture;
             Assert.That(_app.CurrentScreen, Is.EqualTo("TurnResult"));
             Assert.That(battle.IsOver && battle.RewardClaimed, Is.True);
             int gained = _app.Session.State.Gems - gemsBefore;
@@ -174,6 +178,8 @@ namespace TinyExpedition.Tests.PlayMode
             if (battle.Outcome == TinyExpedition.Core.Battle.TurnOutcome.Victory)
                 Assert.That(gained, Is.EqualTo(165), "T-1 첫 클리어 150 + 클리어 15");
             Assert.That(LabelText("Label_Replay"), Does.Contain("--seed " + battle.Seed).And.Contain("--commands A1,"));
+            Assert.That(logs, Has.Member("[TurnReplay] " + battle.Outcome + " · " + _app.TurnReplayCommand(battle)),
+                "버그 리포트용 리플레이 줄이 Player.log에도 남아야 함");
         }
 
         [UnityTest, Property("TC", "TURN-024")]

@@ -22,7 +22,7 @@ QA로 일을 시작해 SDET·플랫폼 엔지니어로 넘어온 경험을 게�
 | 게임 | Unity 6 (6000.5) · uGUI를 코드로 구성 · 모집 / 원정(자동 전투) / **턴제 전투**(속도 순서·스킬 쿨타임·기절/독·3웨이브) / 미니게임 "별빛 타이밍" / QA 디버그 패널 |
 | TC 문서 | [`docs/test-cases.csv`](docs/test-cases.csv) — 89개 (자동화 86 · 수동 3), 영역·우선순위·유형·실행 환경 포함 |
 | 테스트 계획 | [`docs/TEST_PLAN.md`](docs/TEST_PLAN.md) — 위험별 대응, TC 작성 기준, 릴리스 기준, 개발 단계(프로토타입 → 알파 → CBT → 출시 → 라이브)별 범위·진입/종료 기준·산출물 |
-| 체크리스트 | [`docs/checklists/`](docs/checklists/) — 빌드 스모크 12항목(10~15분) · 아웃게임 릴리즈 30항목, 구글 시트로 가져갈 수 있는 CSV, 항목마다 관련 TC |
+| 체크리스트 | [`docs/checklists/`](docs/checklists/) — 빌드 스모크 14항목(10~15분) · 아웃게임 릴리즈 30항목, 구글 시트로 가져갈 수 있는 CSV, 항목마다 관련 TC |
 | 버그 리포트 | [`docs/bug-reports/`](docs/bug-reports/) — Jira 양식. 실제 결함 2건(모두 수정, 회귀 TC 있음) + 시연용 3건(일부러 넣은 결함), 시드·리플레이로 실제 재현한 출력 첨부 |
 | 기획 리뷰 | [`docs/spec-review/gacha.md`](docs/spec-review/gacha.md) — 모집·천장 규칙 11개 정리, 질문 13개·리스크·TC 연결 (리뷰 중 실제 결함 1건 발견·수정) |
 | 자동화 테스트 | NUnit 104개 — dotnet과 Unity EditMode에서 같은 소스로 실행, 둘 다 통과 / Unity PlayMode UI 테스트 6개 통과 / 실제 빌드 자동 플레이 스모크 |

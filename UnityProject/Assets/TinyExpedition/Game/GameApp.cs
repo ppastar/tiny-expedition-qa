@@ -281,8 +281,9 @@ namespace TinyExpedition.Game
                 "Perfect " + game.Taps.Count(t => t.Judgement == Judgement.Perfect) + " · Good " + game.Taps.Count(t => t.Judgement == Judgement.Good)
                 + " · Miss " + game.Taps.Count(t => t.Judgement == Judgement.Miss) + " · 최대 콤보 " + game.MaxCombo, 36);
             UiKit.Label("Label_Reward", col, "보석 +" + gems, 52, UiKit.TextColor);
-            UiKit.Label("Label_Replay", col, "리플레이: " + string.Join(",", game.Taps.Select(t => t.Time.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture))),
-                22, UiKit.Muted, TextAnchor.MiddleCenter, 90);
+            var taps = string.Join(",", game.Taps.Select(t => t.Time.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture)));
+            UiKit.Label("Label_Replay", col, "리플레이: " + taps, 22, UiKit.Muted, TextAnchor.MiddleCenter, 90);
+            Debug.Log("[MiniGameReplay] 점수 " + game.Score + " · qa minigame-replay --taps " + taps);
             UiKit.Button("Btn_Again", col, "한 판 더", ShowMiniGame);
             UiKit.Button("Btn_Back", col, "홈으로", ShowHome, UiKit.Panel);
         }
