@@ -14,18 +14,25 @@ namespace TinyExpedition.Core.Data
         public const string CharactersFile = "characters.json";
         public const string BannersFile = "banners.json";
         public const string StagesFile = "stages.json";
+        public const string SkillsFile = "skills.json";
+        public const string TurnStagesFile = "turn-stages.json";
 
         public IReadOnlyList<CharacterDef> Characters { get; }
         public IReadOnlyList<BannerDef> Banners { get; }
         public IReadOnlyList<StageDef> Stages { get; }
+        public IReadOnlyList<SkillDef> Skills { get; }
+        public IReadOnlyList<TurnStageDef> TurnStages { get; }
 
         private readonly Dictionary<string, CharacterDef> _charById = new Dictionary<string, CharacterDef>();
 
-        public GameDatabase(IEnumerable<CharacterDef> characters, IEnumerable<BannerDef> banners, IEnumerable<StageDef> stages)
+        public GameDatabase(IEnumerable<CharacterDef> characters, IEnumerable<BannerDef> banners, IEnumerable<StageDef> stages,
+            IEnumerable<SkillDef> skills = null, IEnumerable<TurnStageDef> turnStages = null)
         {
             Characters = characters.ToList();
             Banners = banners.ToList();
             Stages = stages.ToList();
+            Skills = (skills ?? Enumerable.Empty<SkillDef>()).ToList();
+            TurnStages = (turnStages ?? Enumerable.Empty<TurnStageDef>()).ToList();
             foreach (var c in Characters)
             {
                 // 중복 id는 DataValidator가 잡는다. 여기서는 처음 것만 쓴다.
@@ -45,7 +52,9 @@ namespace TinyExpedition.Core.Data
             var chars = Parse<List<CharacterDef>>(readFile(CharactersFile), CharactersFile);
             var banners = Parse<List<BannerDef>>(readFile(BannersFile), BannersFile);
             var stages = Parse<List<StageDef>>(readFile(StagesFile), StagesFile);
-            return new GameDatabase(chars, banners, stages);
+            var skills = Parse<List<SkillDef>>(readFile(SkillsFile), SkillsFile);
+            var turnStages = Parse<List<TurnStageDef>>(readFile(TurnStagesFile), TurnStagesFile);
+            return new GameDatabase(chars, banners, stages, skills, turnStages);
         }
 
         private static T Parse<T>(string json, string fileName) where T : class
@@ -73,6 +82,14 @@ namespace TinyExpedition.Core.Data
 
         public BannerDef GetBanner(string id) =>
             Banners.FirstOrDefault(b => b.Id == id) ?? throw new KeyNotFoundException("배너 없음: " + id);
+
+        public bool HasSkill(string id) => id != null && Skills.Any(s => s.Id == id);
+
+        public SkillDef GetSkill(string id) =>
+            Skills.FirstOrDefault(s => s.Id == id) ?? throw new KeyNotFoundException("스킬 없음: " + id);
+
+        public TurnStageDef GetTurnStage(string id) =>
+            TurnStages.FirstOrDefault(s => s.Id == id) ?? throw new KeyNotFoundException("턴제 스테이지 없음: " + id);
 
         public StageDef GetStage(string id) =>
             Stages.FirstOrDefault(s => s.Id == id) ?? throw new KeyNotFoundException("스테이지 없음: " + id);

@@ -130,6 +130,53 @@ namespace TinyExpedition.Core
             return ActionResult<BattleResult>.Success(result);
         }
 
+        public bool IsTurnStageUnlocked(string stageId)
+        {
+            var stage = Db.GetTurnStage(stageId);
+            return stage.RequiresStageId == null || State.ClearedTurnStages.ContainsKey(stage.RequiresStageId);
+        }
+
+        /// <summary>
+        /// 턴제 전투를 시작한다. 전투는 자기 시드로 난수를 따로 쓰므로(리플레이 = 시드 + 명령 목록),
+        /// 세션 시드는 여기서 한 번만 넘어간다. 보상은 끝난 뒤 ClaimTurnBattle로 받는다.
+        /// </summary>
+        public ActionResult<TurnBattle> StartTurnBattle(string stageId, IReadOnlyList<string> partyIds)
+        {
+            if (!IsTurnStageUnlocked(stageId)) return ActionResult<TurnBattle>.Fail(ActionError.StageLocked);
+            if (partyIds == null || partyIds.Count == 0 || partyIds.Count > TurnBattle.MaxPartySize
+                || partyIds.Distinct().Count() != partyIds.Count)
+                return ActionResult<TurnBattle>.Fail(ActionError.InvalidParty);
+            if (partyIds.Any(id => !State.Owned.ContainsKey(id)))
+                return ActionResult<TurnBattle>.Fail(ActionError.CharacterNotOwned);
+
+            ulong battleSeed = ((ulong)_rng.NextUInt() << 32) | _rng.NextUInt();
+            var battle = new TurnBattle(partyIds.Select(Db.GetCharacter).ToList(), Db.GetTurnStage(stageId), Db, battleSeed);
+            _turnBattles.Add(battle);
+            AdvanceSeed();
+            return ActionResult<TurnBattle>.Success(battle);
+        }
+
+        private readonly HashSet<TurnBattle> _turnBattles = new HashSet<TurnBattle>();
+
+        /// <summary>
+        /// 끝난 턴제 전투의 보상(첫 클리어 보석)을 받고 별 기록을 남긴다. 받은 보석 수를 돌려준다.
+        /// 이 세션이 시작한 전투가 아니거나, 끝나지 않았거나, 이미 받은 전투는 0이고 상태를 바꾸지 않는다.
+        /// </summary>
+        public int ClaimTurnBattle(TurnBattle battle)
+        {
+            if (battle == null || !battle.IsOver || battle.RewardClaimed || !_turnBattles.Contains(battle)) return 0;
+            battle.RewardClaimed = true;
+            _turnBattles.Remove(battle);
+            if (battle.Outcome != TurnOutcome.Victory) return 0;
+
+            var id = battle.Stage.Id;
+            bool firstClear = !State.ClearedTurnStages.TryGetValue(id, out int prevStars);
+            int gems = firstClear ? battle.Stage.FirstClearGems : 0;
+            State.Gems += gems;
+            if (battle.Stars > prevStars) State.ClearedTurnStages[id] = battle.Stars;
+            return gems;
+        }
+
         /// <summary>미니게임 한 판이 끝나면 보상을 받는다. 끝나지 않았거나 이미 받은 판은 0.</summary>
         public int ClaimMiniGame(TimingTapGame game)
         {

@@ -1,0 +1,19 @@
+[
+  { "Id": "T-1", "Name": "반딧불 동굴", "RequiresStageId": null, "FirstClearGems": 150,
+    "Waves": [
+      { "Enemies": [ { "Name": "동굴 박쥐", "Hp": 260, "Atk": 38, "Def": 10, "Spd": 105 }, { "Name": "동굴 박쥐", "Hp": 260, "Atk": 38, "Def": 10, "Spd": 105 } ] },
+      { "Enemies": [ { "Name": "독거미", "Hp": 380, "Atk": 42, "Def": 20, "Spd": 95, "SkillId": "e_venom_bite" }, { "Name": "동굴 박쥐", "Hp": 260, "Atk": 38, "Def": 10, "Spd": 105 } ] },
+      { "Enemies": [ { "Name": "돌껍질 달팽이", "Hp": 650, "Atk": 50, "Def": 40, "Spd": 60, "SkillId": "e_shell_slam" } ] }
+    ] },
+  { "Id": "T-2", "Name": "독버섯 늪", "RequiresStageId": "T-1", "FirstClearGems": 250,
+    "Waves": [
+      { "Enemies": [ { "Name": "독거미", "Hp": 420, "Atk": 48, "Def": 20, "Spd": 95, "SkillId": "e_venom_bite" }, { "Name": "독거미", "Hp": 420, "Atk": 48, "Def": 20, "Spd": 95, "SkillId": "e_venom_bite" } ] },
+      { "Enemies": [ { "Name": "수액 요정", "Hp": 380, "Atk": 35, "Def": 25, "Spd": 110, "SkillId": "e_sap_heal" }, { "Name": "늪 개구리", "Hp": 700, "Atk": 60, "Def": 35, "Spd": 80 }, { "Name": "늪 개구리", "Hp": 700, "Atk": 60, "Def": 35, "Spd": 80 } ] },
+      { "Enemies": [ { "Name": "돌껍질 달팽이", "Hp": 900, "Atk": 65, "Def": 55, "Spd": 60, "SkillId": "e_shell_slam" }, { "Name": "수액 요정", "Hp": 380, "Atk": 35, "Def": 25, "Spd": 110, "SkillId": "e_sap_heal" } ] }
+    ] },
+  { "Id": "T-3", "Name": "뿌리 깊은 굴", "RequiresStageId": "T-2", "FirstClearGems": 400,
+    "Waves": [
+      { "Enemies": [ { "Name": "늪 개구리", "Hp": 800, "Atk": 70, "Def": 40, "Spd": 85 }, { "Name": "독거미", "Hp": 480, "Atk": 55, "Def": 25, "Spd": 100, "SkillId": "e_venom_bite" }, { "Name": "수액 요정", "Hp": 420, "Atk": 40, "Def": 30, "Spd": 115, "SkillId": "e_sap_heal" } ] },
+      { "Enemies": [ { "Name": "뿌리 골렘", "Hp": 3200, "Atk": 100, "Def": 85, "Spd": 70, "SkillId": "e_root_quake" } ] }
+    ] }
+]
