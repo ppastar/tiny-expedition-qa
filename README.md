@@ -21,6 +21,10 @@ QA로 일을 시작해 SDET·플랫폼 엔지니어로 넘어온 경험을 게�
 |---|---|
 | 게임 | Unity 6 (6000.5) · uGUI를 코드로 구성 · 모집 / 원정(자동 전투) / 미니게임 "별빛 타이밍" / QA 디버그 패널 |
 | TC 문서 | [`docs/test-cases.csv`](docs/test-cases.csv) — 60개 (자동화 58 · 수동 2), 영역·우선순위·유형·실행 환경 포함 |
+| 테스트 계획 | [`docs/TEST_PLAN.md`](docs/TEST_PLAN.md) — 위험별 대응, TC 작성 기준, 릴리스 기준, 개발 단계(프로토타입 → 알파 → CBT → 출시 → 라이브)별 범위·진입/종료 기준·산출물 |
+| 체크리스트 | [`docs/checklists/`](docs/checklists/) — 빌드 스모크 12항목(10~15분) · 아웃게임 릴리즈 30항목, 구글 시트로 가져갈 수 있는 CSV, 항목마다 관련 TC |
+| 버그 리포트 | [`docs/bug-reports/`](docs/bug-reports/) — Jira 양식. 실제 결함 2건(1건 수정·1건 열림) + 시연용 3건(일부러 넣은 결함), 시드·리플레이로 실제 재현한 출력 첨부 |
+| 기획 리뷰 | [`docs/spec-review/gacha.md`](docs/spec-review/gacha.md) — 모집·천장 규칙 11개 정리, 질문 13개·리스크·TC 연결 (리뷰 중 실제 결함 1건 발견) |
 | 자동화 테스트 | NUnit 72개 — dotnet과 Unity EditMode에서 같은 소스로 실행, 둘 다 통과 / Unity PlayMode UI 테스트 4개 통과 / 실제 빌드 자동 플레이 스모크 |
 | 커버리지 | 게임 규칙(Core) 라인 92.7% · 화면(Game) 58.9% — Unity Code Coverage ([요약](docs/reports/coverage-summary.md)) |
 | QA 도구 | `qa-tool` CLI — 데이터 검사 · 확률 검증 · 전투/미니게임 리플레이 · TC 추적 리포트 / 뮤테이션 스모크 16/16 · 빌드 자동 플레이(`-qaAutoplay`) · Unity 에디터 메뉴·빌드 전 데이터 검사 훅 |
@@ -46,6 +50,10 @@ UnityProject/Assets/
   StreamingAssets/GameData/   characters.json · banners.json · stages.json
 dotnet/              ← Core·테스트를 Unity 없이 빌드하는 프로젝트 + qa-tool
 docs/                ← TC 문서, 테스트 계획
+  checklists/          빌드 스모크·아웃게임 릴리즈 체크리스트 (CSV)
+  bug-reports/         버그 리포트 (BUG = 실제 결함, DEMO = 시연용)
+  spec-review/         기획 리뷰 (모집·천장)
+  reports/             확률 검증·TC 추적·커버리지 리포트, 자동 플레이 스크린샷
 samples/broken-data/ ← 일부러 틀리게 만든 기획 데이터 (도구 시연용)
 scripts/             ← 전체 파이프라인, Unity 테스트 실행, 뮤테이션 스모크
 ```
@@ -184,9 +192,40 @@ python scripts/mutation_smoke.py
 
 Unity에서 열 때는 Unity Hub에서 `UnityProject` 폴더를 추가하고, 메뉴 **Tiny Expedition → Main 씬 만들기**를 한 번 실행한 뒤 Play 합니다.
 
+## QA 문서
+
+자동화와 별개로, 사람이 하는 게임 QA 실무 문서를 이 게임 기준으로 만들었습니다.
+
+| 문서 | 내용 |
+|---|---|
+| [모집·천장 기획 리뷰](docs/spec-review/gacha.md) | 코드·데이터를 기획서로 놓고 규칙을 다시 적고, 규칙이 겹치는 곳(천장×10연, 천장×픽업, 보정×데이터)을 질문 13개로 정리. 각 질문을 TC 또는 "TC 추가 후보"로 연결. 사후 작성임을 문서에 밝힘 |
+| [버그 리포트](docs/bug-reports/README.md) | 요약·환경·심각도/우선순위·재현 절차·기대/실제·재현율·첨부·원인·수정 확인 |
+| [빌드 스모크 CL](docs/checklists/build-smoke.csv) / [릴리즈 CL](docs/checklists/outgame-release.csv) | 새 빌드를 받았을 때 / 출시 전에 훑는 목록. `자동 확인` 열로 CI·자동 플레이가 이미 덮는 범위를 표시 |
+| [개발 단계별 계획](docs/TEST_PLAN.md#7-개발-단계별-테스트-계획) | 단계마다 QA 범위, 다음 단계로 넘기는 기준, 남길 문서 |
+
+버그 리포트 중 실제 결함은 두 건입니다.
+
+- [BUG-001](docs/bug-reports/BUG-001-gems-taken-on-failed-pull.md) 모집이 데이터 오류로 실패해도 보석이 먼저 빠짐 — 수정 전 커밋(15562c3)에서 10/10 재현, 4458613에서 수정, 회귀 TC GACHA-015.
+- [BUG-002](docs/bug-reports/BUG-002-ten-pull-guarantee-without-two-star-pool.md) "2성 0% + 2성 후보 없음 + 10연 보정" 배너가 데이터 검사를 통과하고 10연이 시드 100개 중 76개에서 실패 — 기획 리뷰 중 발견, **아직 열려 있음**. 이 조합 때문에 BUG-001이 검사기를 통과하는 데이터로도 터질 수 있었음을 확인.
+
+나머지 3건(DEMO-001~003)은 뮤테이션 스모크용 결함을 일부러 넣고 재현한 **시연용**이며, 문서 맨 위에 그렇게 표시했습니다.
+
+## AI와 함께 만든 방식
+
+이 프로젝트는 Claude Code(AI 코딩 도구)와 함께 만들었습니다. 커밋에 `Co-Authored-By: Claude`가 붙어 있는 것이 그 기록입니다. 역할은 이렇게 나눴습니다.
+
+| 누가 | 무엇을 |
+|---|---|
+| 사람(저) | 무엇이 위험한지(1장 위험 표), 어떤 TC가 필요한지, 판정 기준(카이제곱 유의수준, 허용 오차, 경계값 세 점), 릴리스 기준을 정하고, 결과를 보고 통과 여부를 판단 |
+| AI | 정한 기준에 맞춰 게임 코드·테스트·QA 도구·문서 초안을 구현하고, 실행해 결과를 보고 |
+| 도구 | AI가 만든 테스트를 믿기 전에 검증 — 뮤테이션 스모크(그럴듯한 버그 16개를 넣어 테스트가 다 잡는지, 16/16), TC 추적 리포트(문서에 있는데 테스트가 없거나, 테스트에만 있는 TC 번호를 실패로 표시) |
+
+AI가 쓴 테스트는 "통과한다"만으로는 믿을 수 없어서(아무것도 확인하지 않는 테스트도 통과합니다), **테스트가 실제로 버그를 잡는지**를 뮤테이션으로, **문서와 테스트가 어긋나지 않는지**를 추적 리포트로 확인하는 장치를 함께 만들었습니다. 이 문서들의 출력·수치도 모두 실제로 실행해 받은 값만 적었습니다.
+
 ## 현재 상태와 한계
 
 - 규칙 테스트 72개는 dotnet·Unity EditMode 양쪽에서, UI 테스트 4개는 Unity PlayMode에서 통과했습니다. 세 결과를 합친 추적 리포트 기준 자동화 TC 58/58 통과, 수동 TC 2개.
+- 알려진 결함: [BUG-002](docs/bug-reports/BUG-002-ten-pull-guarantee-without-two-star-pool.md) (데이터 검사기 규칙 누락, 현재 실제 데이터에서는 발생하지 않음). 수정은 다음 작업.
 - 같은 파이프라인과 뮤테이션 스모크가 GitHub Actions(Ubuntu)에서도 통과합니다. Unity 테스트는 라이선스가 필요해 로컬 스크립트로 돌립니다.
 - 데이터를 `File` API로 읽으므로 Windows/에디터 기준입니다. Android·WebGL은 `UnityWebRequest`로 StreamingAssets를 읽도록 바꿔야 합니다.
 - 한글 표시는 OS 폰트(맑은 고딕 등)에 기대고 있어 WebGL에서는 한글 폰트를 따로 넣어야 합니다.
