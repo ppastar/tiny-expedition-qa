@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <AssemblyName>qa-tool.Tests</AssemblyName>
+    <RootNamespace>TinyExpedition.QaTool.Tests</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- qa-tool은 Unity에 없으므로 이 테스트는 dotnet에서만 돈다 (Tests/Shared에 넣지 않는다) -->
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="NUnit" Version="3.14.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
+    <PackageReference Include="NunitXml.TestLogger" Version="6.1.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\QaTool\QaTool.csproj" />
+  </ItemGroup>
+</Project>

@@ -13,6 +13,8 @@ dotnet build dotnet/TinyExpedition.slnx -c Release -v q --nologo || exit 1
 echo "== 2. 단위 테스트 (dotnet, 엔진 없이)"
 dotnet test dotnet/Core.Tests -c Release --no-build --nologo \
   --logger "nunit;LogFilePath=$PWD/artifacts/dotnet-results.xml" || status=1
+echo "-- qa-tool 테스트 (시드 옵션 등 도구 자체)"
+dotnet test dotnet/QaTool.Tests -c Release --no-build --nologo   --logger "nunit;LogFilePath=$PWD/artifacts/qatool-results.xml" || status=1
 
 echo "== 3. 기획 데이터 검사"
 $QA validate-data || status=1
@@ -20,7 +22,7 @@ $QA validate-data || status=1
 echo "== 4. 모집 확률 검증"
 $QA gacha-verify --pulls "${GACHA_PULLS:-1000000}" --out artifacts/gacha-report.md || status=1
 
-results="dotnet=artifacts/dotnet-results.xml"
+results="dotnet=artifacts/dotnet-results.xml,qa-tool=artifacts/qatool-results.xml"
 if [ -n "${UNITY:-}" ]; then
   echo "== 5. Unity EditMode / PlayMode 테스트"
   scripts/run-unity-tests.sh || status=1

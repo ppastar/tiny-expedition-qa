@@ -14,6 +14,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 CORE = ROOT / "UnityProject/Assets/TinyExpedition/Core"
 
 # (설명, 파일, 원래 코드, 버그 코드)
+# 파일이 "dotnet/"으로 시작하면 저장소 루트 기준(qa-tool)이고 qa-tool 테스트로 확인한다. 나머지는 Core 기준.
 MUTATIONS = [
     ("천장 off-by-one (90번째가 아니라 91번째에 확정)", "Gacha/GachaService.cs",
      "count >= banner.HardPity", "count > banner.HardPity"),
@@ -82,15 +83,24 @@ MUTATIONS = [
      "battle.RewardClaimed = true;\n            _turnBattles.Remove(battle);", ""),
     ("[턴제] 첫 클리어가 아니어도 보석 지급", "GameSession.cs",
      "(firstClear ? battle.Stage.FirstClearGems : 0)", "battle.Stage.FirstClearGems"),
+    # --- qa-tool (BUG-003) ---
+    ("[qa-tool] 시드를 long으로 읽음 (long 최대값보다 큰 시드 거부, 음수는 큰 시드로 바뀜)", "dotnet/QaTool/Common.cs",
+     "return ulong.TryParse(v.Replace(\"_\", \"\"), out var n) ? n :",
+     "return long.TryParse(v.Replace(\"_\", \"\"), out var n) ? (ulong)n :"),
+    ("[qa-tool] battle-replay만 시드를 long으로 읽음 (호출부 되돌림)", "dotnet/QaTool/SmallCommands.cs",
+     'ulong seed = o.GetULong("seed", 1);', 'ulong seed = (ulong)o.GetLong("seed", 1);'),
 ]
 
+CORE_TESTS = "dotnet/Core.Tests"
+TOOL_TESTS = "dotnet/QaTool.Tests"
 
-def run_tests() -> tuple[str, list[str]]:
+
+def run_tests(project: str = CORE_TESTS) -> tuple[str, list[str]]:
     """결과: ("pass" | "fail" | "build-error", 실패한 TC 번호 목록)"""
     xml = ROOT / "artifacts" / "mutation-run.xml"
     xml.unlink(missing_ok=True)
     p = subprocess.run(
-        ["dotnet", "test", str(ROOT / "dotnet/Core.Tests"), "--nologo", "-v", "q",
+        ["dotnet", "test", str(ROOT / project), "--nologo", "-v", "q",
          "--logger", f"nunit;LogFilePath={xml}"],
         capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
@@ -108,14 +118,14 @@ def run_tests() -> tuple[str, list[str]]:
 
 
 def main() -> int:
-    result, _ = run_tests()
-    if result != "pass":
+    if any(run_tests(project)[0] != "pass" for project in (CORE_TESTS, TOOL_TESTS)):
         print("원본 코드에서 이미 테스트가 실패합니다. 먼저 고치세요.")
         return 2
 
     survived = []
     for desc, rel, before, after in MUTATIONS:
-        path = CORE / rel
+        is_tool = rel.startswith("dotnet/")
+        path = ROOT / rel if is_tool else CORE / rel
         original = path.read_bytes()
         if b"\r\n" in original:  # 작업 폴더가 CRLF면 코드 조각도 CRLF로 맞춘다
             before, after = before.replace("\n", "\r\n"), after.replace("\n", "\r\n")
@@ -125,7 +135,7 @@ def main() -> int:
             continue
         try:
             path.write_bytes(original.replace(before.encode("utf-8"), after.encode("utf-8"), 1))
-            result, failed_tcs = run_tests()
+            result, failed_tcs = run_tests(TOOL_TESTS if is_tool else CORE_TESTS)
         finally:
             path.write_bytes(original)
         if result == "pass":
