@@ -258,7 +258,7 @@ AI가 쓴 테스트는 "통과한다"만으로는 믿을 수 없어서(아무것
 
 ## 현재 상태와 한계
 
-- 규칙 테스트 104개는 dotnet·Unity EditMode(6000.5.6f1) 양쪽에서, UI 테스트 6개는 Unity PlayMode에서 통과했습니다. 세 결과를 합친 추적 리포트 기준 자동화 TC 86/86 통과, 수동 TC 3개. 실제 Windows 개발 빌드의 자동 플레이도 턴제 단계까지 통과했고, 그 판의 리플레이 명령줄을 `qa turn-replay`(.NET)로 돌려 같은 결과(승리·14라운드·명령 41개)가 나오는 것을 확인했습니다.
+- 규칙 테스트 104개는 dotnet·Unity EditMode(6000.5.6f1) 양쪽에서, UI 테스트 6개는 Unity PlayMode에서 통과했습니다. 세 결과를 합친 추적 리포트 기준 자동화 TC 86/86 통과, 수동 TC 3개. 실제 Windows 개발 빌드의 자동 플레이도 턴제 단계까지 통과했고, 그 판의 시드와 명령 41개를 `qa turn-replay --auto false`(.NET)로 다시 돌려 같은 결과(승리·14라운드·마지막 HP까지 동일)가 나오는 것을 확인했습니다 — Unity(Mono)와 .NET에서 같은 전투.
 - 알려진 열린 결함 없음. 마지막 실제 결함 [BUG-002](docs/bug-reports/BUG-002-ten-pull-guarantee-without-two-star-pool.md)(데이터 검사기 규칙 누락)는 검사기 규칙 + DATA-010으로 수정.
 - 같은 파이프라인과 뮤테이션 스모크가 GitHub Actions(Ubuntu)에서도 통과합니다. Unity 테스트는 라이선스가 필요해 로컬 스크립트로 돌립니다.
 - 데이터를 `File` API로 읽으므로 Windows/에디터 기준입니다. Android·WebGL은 `UnityWebRequest`로 StreamingAssets를 읽도록 바꿔야 합니다.
