@@ -47,6 +47,8 @@ MUTATIONS = [
      "if (state.Gems < 0) throw", "if (false) throw"),
     ("확률표 합계 검사 누락", "Data/DataValidator.cs",
      "if (sum != 10000)", "if (false)"),
+    ("10연 보정 대상(2성) 후보 검사 누락", "Data/DataValidator.cs",
+     "if (b.TenPullGuarantee && (", "if (false && ("),
 ]
 
 

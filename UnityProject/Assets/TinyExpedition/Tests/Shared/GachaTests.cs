@@ -142,6 +142,31 @@ namespace TinyExpedition.Tests
             Assert.That(s.State.Owned, Is.Empty);
         }
 
+        [Test, TC("GACHA-015")]
+        public void TenPullGuaranteeWithoutTwoStarPool_FailsWithoutSideEffects()
+        {
+            // BUG-002 배너가 검사기를 거치지 않고 들어왔을 때: 보정이 걸린 10연은 DataError로 실패하고 상태는 그대로여야 한다.
+            var banner = TestData.Banner(250, 0, 9750);
+            banner.Pool[Rarity.TwoStar].Clear();
+            int failed = 0;
+            for (ulong seed = 1; seed <= 100; seed++)
+            {
+                var s = Session(3000, banner);
+                s.Reseed(seed);
+                s.State.Pity["b_test"] = new PityState { PullsSinceThreeStar = 5 };
+
+                var r = s.Pull("b_test", 10);
+                if (r.Ok) continue;
+
+                failed++;
+                Assert.That(r.Error, Is.EqualTo(ActionError.DataError), "시드 " + seed);
+                Assert.That(s.State.Gems, Is.EqualTo(3000), "시드 " + seed + ": 보석 그대로");
+                Assert.That(s.State.Pity["b_test"].PullsSinceThreeStar, Is.EqualTo(5), "시드 " + seed + ": 천장 그대로");
+                Assert.That(s.State.Owned, Is.Empty, "시드 " + seed + ": 보유 그대로");
+            }
+            Assert.That(failed, Is.GreaterThan(0), "보정이 걸리는 시드가 하나도 없으면 이 테스트는 아무것도 확인하지 않음");
+        }
+
         [Test, TC("GACHA-014")]
         public void InvalidPullCount_Throws()
         {
