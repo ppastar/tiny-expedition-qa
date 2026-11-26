@@ -27,7 +27,7 @@ public static class GachaVerifyCommand
     {
         var db = Repo.LoadDb(o);
         long pulls = o.GetLong("pulls", 1_000_000);
-        ulong seed = (ulong)o.GetLong("seed", 1);
+        ulong seed = o.GetULong("seed", 1);
         var which = o.Get("banner", "all");
         var banners = which == "all" ? db.Banners.ToList() : new List<BannerDef> { db.GetBanner(which) };
 

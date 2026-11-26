@@ -40,7 +40,7 @@ public static class BattleReplayCommand
         var stage = db.GetStage(o.Require("stage"));
         var party = o.Require("party").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Select(db.GetCharacter).ToList();
-        ulong seed = (ulong)o.GetLong("seed", 1);
+        ulong seed = o.GetULong("seed", 1);
 
         var result = BattleSimulator.Run(party, stage, new Pcg32(seed));
         Console.WriteLine($"스테이지 {stage.Id} {stage.Name} · 파티 {string.Join(", ", party.Select(p => p.Name))} · 시드 {seed}");
@@ -59,7 +59,7 @@ public static class TurnReplayCommand
         var stage = db.GetTurnStage(o.Require("stage"));
         var party = o.Require("party").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Select(db.GetCharacter).ToList();
-        ulong seed = (ulong)o.GetLong("seed", 1);
+        ulong seed = o.GetULong("seed", 1);
         var commands = o.Get("commands", "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Select(TurnCommand.Parse).ToList();
         bool autoRest = o.Get("auto", "true") != "false";
