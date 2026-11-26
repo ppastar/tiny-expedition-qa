@@ -10,7 +10,7 @@ namespace TinyExpedition.Game
     /// <summary>
     /// 개발 빌드 전용 자동 플레이(빌드 스모크 테스트).
     /// 실행: TinyExpedition.exe -qaAutoplay &lt;결과 폴더&gt;
-    /// 홈 → 10연 모집 → 보유 캐릭터 → 원정 1-1 전투 → 미니게임 한 판 → 턴제 T-1 전투를 실제 빌드에서 진행하고
+    /// 홈 → 10연 모집 → 보유 캐릭터 → 원정 1-1 전투 → 미니게임 한 판 → 턴제 T-1 전투(2.5D 무대)를 실제 빌드에서 진행하고
     /// 단계마다 스크린샷을 남긴 뒤 종료한다. 실패하면 종료 코드 1.
     /// 출시 빌드에는 컴파일되지 않는다.
     /// </summary>
@@ -130,7 +130,7 @@ namespace TinyExpedition.Game
             Expect(_app.CurrentScreen == "MiniGameResult", "미니게임 결과 화면");
             yield return Shot("minigame-result");
 
-            // 턴제 전투: 대상을 골라 직접 한 번 공격하고, 나머지는 자동으로 끝까지
+            // 턴제 전투(2.5D): 대상을 골라 직접 공격 → 스킬 → 4배속 자동으로 끝까지. 연출 도중의 화면도 찍는다.
             Click("Btn_Back");
             yield return Wait(0.3f);
             Click("Btn_TurnBattle");
@@ -138,23 +138,73 @@ namespace TinyExpedition.Game
             Expect(_app.CurrentScreen == "TurnStages", "턴제 스테이지 화면");
             yield return Shot("turn-stages");
             Click("Btn_TurnStage_T-1");
-            yield return Wait(0.5f);
+            yield return Wait(1.2f);
             Expect(_app.CurrentScreen == "TurnBattle", "턴제 전투 화면");
+            var stage = _app.Stage;
+            Expect(stage != null && stage.Cam != null && !stage.Cam.orthographic, "2.5D 전투 무대 (원근 카메라)");
+            yield return WaitIdle();
             yield return Shot("turn-battle");
+
             Click("Btn_Target_1");
-            yield return Wait(0.2f);
+            yield return Wait(0.3f);
             Click("Btn_Attack");
-            yield return Wait(0.5f);
+            yield return Wait(0.24f);
+            Expect(stage.IsPlaying, "공격 연출 재생 중");
+            Expect(!_app.Find<Button>("Btn_Attack").interactable, "연출 중에는 공격 버튼 잠김");
+            yield return Shot("turn-battle-attack");
+            yield return WaitIdle();
             Expect(_app.CurrentTurnBattle.Commands.Count == 1, "턴제 명령 1개 기록");
+            Expect(stage.ShownHpText(TinyExpedition.Core.Battle.Side.Enemy, 1) == _app.CurrentTurnBattle.Enemies[1].Hp + "/" + _app.CurrentTurnBattle.Enemies[1].MaxHp,
+                "공격받은 적의 화면 HP = 실제 HP");
+
+            if (_app.CurrentScreen == "TurnBattle" && !_app.CurrentTurnBattle.IsOver)
+            {
+                bool skill = _app.Find<Button>("Btn_Skill").interactable;
+                Click(skill ? "Btn_Skill" : "Btn_Guard");
+                yield return Wait(0.62f);
+                yield return Shot(skill ? "turn-battle-skill" : "turn-battle-guard");
+                yield return WaitIdle();
+            }
+
             if (_app.CurrentScreen == "TurnBattle")
             {
-                yield return Shot("turn-battle-after-attack");
-                Click("Btn_AutoAll");
-                yield return Wait(0.5f);
+                Click("Btn_Speed");
+                Click("Btn_Speed");
+                Expect(_app.BattleSpeed == 4f, "배속 ×4");
+                Click("Btn_Auto");
+                bool shotWave = false;
+                float turnDeadline = Time.realtimeSinceStartup + 180f;
+                while (_app.CurrentScreen == "TurnBattle")
+                {
+                    if (Time.realtimeSinceStartup > turnDeadline) throw new Exception("턴제 전투가 제한 시간 안에 끝나지 않음");
+                    if (!shotWave && stage.Display.WaveIndex >= 1 && !stage.IsPlaying)
+                    {
+                        shotWave = true;
+                        yield return Shot("turn-battle-wave2");
+                    }
+                    yield return null;
+                }
             }
             Expect(_app.CurrentScreen == "TurnResult", "턴제 결과 화면");
+            Expect(stage.MismatchCount == 0, "화면 상태 = 전투 상태 (대조 " + stage.SyncChecks + "번, 불일치 0)");
+            Expect(stage.AnimatedEntries > 20, "로그를 연출로 재생함 (" + stage.AnimatedEntries + "줄)");
+            stage.FrameStats(out int frames, out float avgMs, out float p95Ms, out float maxMs);
+            Log("전투 화면 프레임 시간 · " + frames + "프레임 · 평균 " + avgMs.ToString("0.0") + "ms · 95% " + p95Ms.ToString("0.0") + "ms · 최대 " + maxMs.ToString("0.0") + "ms");
+            Expect(frames > 100 && avgMs < 50f, "전투 화면 평균 프레임 시간 50ms 미만");
             Log("턴제 결과 " + _app.CurrentTurnBattle.Outcome + " · 시드 " + _app.CurrentTurnBattle.Seed);
+            yield return Wait(0.4f);
             yield return Shot("turn-result");
+        }
+
+        /// <summary>전투 연출이 끝나 명령을 받을 수 있을 때까지 기다린다.</summary>
+        private IEnumerator WaitIdle()
+        {
+            float deadline = Time.realtimeSinceStartup + 30f;
+            while (_app.Stage != null && _app.Stage.IsPlaying)
+            {
+                if (Time.realtimeSinceStartup > deadline) throw new Exception("전투 연출이 30초 안에 끝나지 않음");
+                yield return null;
+            }
         }
 
         private void Click(string name)

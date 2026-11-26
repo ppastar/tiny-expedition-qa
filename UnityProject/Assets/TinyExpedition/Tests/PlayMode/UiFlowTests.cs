@@ -196,5 +196,169 @@ namespace TinyExpedition.Tests.PlayMode
             Assert.That(_app.Session.State.ClearedTurnStages, Is.Empty);
             Assert.That(_app.CurrentTurnBattle, Is.Null);
         }
+
+        // ---------------- 2.5D 전투 무대 ----------------
+
+        private IEnumerator WaitIdle(float seconds = 30f)
+        {
+            float deadline = Time.realtimeSinceStartup + seconds;
+            while (_app.Stage != null && _app.Stage.IsPlaying)
+            {
+                Assert.That(Time.realtimeSinceStartup, Is.LessThan(deadline), "연출이 제한 시간 안에 끝나지 않음");
+                yield return null;
+            }
+        }
+
+        /// <summary>화면 머리 위 HP 글자와 서 있는 그림이 Core 상태와 같은지.</summary>
+        private void AssertShownMatchesCore(string when)
+        {
+            var battle = _app.CurrentTurnBattle;
+            var stage = _app.Stage;
+            foreach (var u in battle.Allies.Concat(battle.Enemies))
+            {
+                string who = when + " · " + u.Side + u.Slot + " " + u.Name;
+                Assert.That(stage.ShownHpText(u.Side, u.Slot), Is.EqualTo(u.Hp + "/" + u.MaxHp), who + " HP 글자");
+                Assert.That(stage.IsShownStanding(u.Side, u.Slot), Is.EqualTo(u.IsAlive), who + " 서 있음/쓰러짐");
+            }
+        }
+
+        [UnityTest, Property("TC", "TURN-028")]
+        public IEnumerator TurnStage_ShownHpAndDeaths_MatchCore_AfterEveryPlayback()
+        {
+            yield return EnterTurnBattle();
+            var battle = _app.CurrentTurnBattle;
+            var stage = _app.Stage;
+            Assert.That(stage, Is.Not.Null);
+            Assert.That(stage.Cam.orthographic, Is.False, "원근 카메라 (2.5D)");
+            _app.BattleSpeed = 25f;
+            yield return WaitIdle();
+            AssertShownMatchesCore("시작");
+
+            Btn("Btn_Target_1").onClick.Invoke();
+            Btn("Btn_Attack").onClick.Invoke();
+            // Core는 이미 계산을 끝냈지만 화면은 아직 한 줄도 재생하지 않았다
+            Assert.That(stage.IsPlaying, Is.True);
+            Assert.That(battle.Enemies[1].Hp, Is.LessThan(battle.Enemies[1].MaxHp));
+            Assert.That(stage.Display.Enemies[1].Hp, Is.EqualTo(battle.Enemies[1].MaxHp), "맞기 전에 HP가 먼저 줄어 보이면 안 됨");
+            yield return WaitIdle();
+            AssertShownMatchesCore("첫 공격 뒤");
+
+            Btn("Btn_Auto").onClick.Invoke();
+            Assert.That(_app.AutoBattle, Is.True);
+            int checks = 0;
+            float deadline = Time.realtimeSinceStartup + 90f;
+            while (_app.CurrentScreen == "TurnBattle")
+            {
+                Assert.That(Time.realtimeSinceStartup, Is.LessThan(deadline), "자동 전투가 제한 시간 안에 끝나지 않음");
+                if (!stage.IsPlaying)
+                {
+                    AssertShownMatchesCore("명령 " + battle.Commands.Count + "개 뒤");
+                    checks++;
+                }
+                yield return null;
+            }
+
+            Assert.That(_app.CurrentScreen, Is.EqualTo("TurnResult"));
+            Assert.That(battle.IsOver, Is.True);
+            Assert.That(checks, Is.GreaterThan(5));
+            Assert.That(stage.MismatchCount, Is.EqualTo(0));
+            Assert.That(stage.SyncChecks, Is.GreaterThanOrEqualTo(battle.Commands.Count));
+            Assert.That(stage.AnimatedEntries, Is.EqualTo(battle.Log.Count), "건너뛰지 않았으니 모든 로그 줄을 연출로 재생");
+            Assert.That(LabelText("Label_Reward"), Does.StartWith("보석 +"));
+            // 화면과 Core가 다르면 무대가 Debug.LogError([TurnView])를 남기고, Unity 테스트는 오류 로그가 있으면 실패한다
+        }
+
+        private sealed class TurnRun
+        {
+            public string Replay, Outcome, AllyHp;
+            public int Gems, Animated, LogCount;
+        }
+
+        /// <summary>같은 시드로 T-1을 자동 명령으로 끝낸다. skipAfter번째 명령 뒤에 건너뛰기(-1이면 끝까지 연출).</summary>
+        private IEnumerator PlayTurnBattle(float speed, int skipAfter, System.Action<TurnRun> done)
+        {
+            yield return EnterTurnBattle();
+            var battle = _app.CurrentTurnBattle;
+            var stage = _app.Stage;
+            int gemsBefore = _app.Session.State.Gems;
+            _app.BattleSpeed = speed;
+            _app.AutoBattle = true;
+            float deadline = Time.realtimeSinceStartup + 90f;
+            while (_app.CurrentScreen == "TurnBattle")
+            {
+                Assert.That(Time.realtimeSinceStartup, Is.LessThan(deadline));
+                if (skipAfter >= 0 && battle.Commands.Count >= skipAfter) Btn("Btn_AutoAll").onClick.Invoke();
+                else yield return null;
+            }
+            Assert.That(_app.CurrentScreen, Is.EqualTo("TurnResult"));
+            Assert.That(stage.MismatchCount, Is.EqualTo(0));
+            done(new TurnRun
+            {
+                Replay = _app.TurnReplayCommand(battle), Outcome = battle.Outcome + " R" + battle.Round + " ★" + battle.Stars,
+                AllyHp = string.Join(",", battle.Allies.Select(a => a.Hp)), Gems = _app.Session.State.Gems - gemsBefore,
+                Animated = stage.AnimatedEntries, LogCount = battle.Log.Count,
+            });
+            Object.Destroy(_app.gameObject);
+            _app = null;
+            yield return null;
+        }
+
+        [UnityTest, Property("TC", "TURN-029")]
+        public IEnumerator TurnStage_SpeedAndSkip_DoNotChangeResult()
+        {
+            TurnRun skipped = null, animated = null, mixed = null;
+            yield return PlayTurnBattle(1f, 0, r => skipped = r);    // 시작하자마자 건너뛰기 (연출 0줄)
+            yield return PlayTurnBattle(30f, -1, r => animated = r); // 30배속으로 끝까지 연출
+            yield return PlayTurnBattle(4f, 3, r => mixed = r);      // 4배속으로 3명령, 그 뒤 건너뛰기
+
+            Assert.That(skipped.Animated, Is.EqualTo(0));
+            Assert.That(animated.Animated, Is.EqualTo(animated.LogCount));
+            Assert.That(mixed.Animated, Is.GreaterThan(0).And.LessThan(mixed.LogCount));
+            foreach (var other in new[] { animated, mixed })
+            {
+                Assert.That(other.Replay, Is.EqualTo(skipped.Replay), "같은 시드·같은 명령 목록");
+                Assert.That(other.Outcome, Is.EqualTo(skipped.Outcome));
+                Assert.That(other.AllyHp, Is.EqualTo(skipped.AllyHp));
+                Assert.That(other.Gems, Is.EqualTo(skipped.Gems));
+            }
+        }
+
+        [UnityTest, Property("TC", "TURN-030")]
+        public IEnumerator TurnStage_CommandsLockedWhilePlaying()
+        {
+            yield return EnterTurnBattle();
+            var battle = _app.CurrentTurnBattle;
+            var stage = _app.Stage;
+            yield return WaitIdle();
+            Assert.That(Btn("Btn_Attack").interactable, Is.True);
+
+            Btn("Btn_Attack").onClick.Invoke();
+            yield return null;
+            Assert.That(stage.IsPlaying, Is.True, "1배속이라 한 프레임 뒤에도 연출 중");
+            Assert.That(Btn("Btn_Attack").interactable, Is.False);
+            Assert.That(Btn("Btn_Guard").interactable, Is.False);
+            Assert.That(Btn("Btn_Skill").interactable, Is.False);
+
+            // 연타: 버튼이 잠겨 있어도 호출이 들어오면(자동화·키 입력) 명령으로 기록되면 안 된다
+            for (int i = 0; i < 5; i++)
+            {
+                Btn("Btn_Attack").onClick.Invoke();
+                Btn("Btn_Guard").onClick.Invoke();
+            }
+            Assert.That(battle.Commands.Select(c => c.ToString()), Is.EqualTo(new[] { "A0" }));
+            Assert.That(_app.IgnoredCommands, Is.EqualTo(10));
+
+            // 대상 고르기와 배속은 연출 중에도 된다
+            Btn("Btn_Speed").onClick.Invoke();
+            Assert.That(_app.BattleSpeed, Is.EqualTo(2f));
+            _app.BattleSpeed = 30f;
+            yield return WaitIdle();
+            Assert.That(Btn("Btn_Attack").interactable, Is.True);
+            Btn("Btn_Guard").onClick.Invoke();
+            Assert.That(battle.Commands.Select(c => c.ToString()), Is.EqualTo(new[] { "A0", "G" }));
+            yield return WaitIdle();
+            Assert.That(stage.MismatchCount, Is.EqualTo(0));
+            LogAssert.NoUnexpectedReceived();
+        }
     }
 }

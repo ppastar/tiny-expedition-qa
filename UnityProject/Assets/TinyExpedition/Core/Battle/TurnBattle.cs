@@ -90,9 +90,35 @@ namespace TinyExpedition.Core.Battle
         public bool Crit { get; }
         public string Text { get; }
 
-        internal TurnLogEntry(int round, int wave, TurnLogKind kind, string actor, string target, int amount, bool crit, string text)
+        // ---- 화면 연출용 정보 (규칙에는 쓰이지 않는다) ----
+        // 이름은 겹칠 수 있어서(같은 웨이브의 "동굴 박쥐" 둘) 화면은 편·슬롯으로 유닛을 찾는다. 적 슬롯은 Wave 번째 웨이브 기준.
+        public Side ActorSide { get; }
+        /// <summary>행동한 유닛의 슬롯. 없으면 -1.</summary>
+        public int ActorSlot { get; }
+        public Side TargetSide { get; }
+        /// <summary>대상 유닛의 슬롯. 없으면 -1.</summary>
+        public int TargetSlot { get; }
+        /// <summary>이 일이 끝난 뒤의 상태. 대상이 있으면 대상, 없으면 행동한 유닛 기준. 둘 다 없으면 -1.</summary>
+        public int HpAfter { get; }
+        public int StunAfter { get; }
+        public int PoisonAfter { get; }
+        /// <summary>StatusApplied일 때 걸린 상태이상.</summary>
+        public StatusKind Status { get; }
+        /// <summary>스킬·회복일 때 스킬 이름.</summary>
+        public string SkillName { get; }
+        /// <summary>대상이 방어 중이어서 피해가 줄었는지.</summary>
+        public bool Guarded { get; }
+
+        internal TurnLogEntry(int round, int wave, TurnLogKind kind, TurnUnit actor, TurnUnit target, int amount, bool crit, string text,
+            StatusKind status = StatusKind.None, string skillName = null)
         {
-            Round = round; Wave = wave; Kind = kind; Actor = actor; Target = target; Amount = amount; Crit = crit; Text = text;
+            Round = round; Wave = wave; Kind = kind; Actor = actor?.Name; Target = target?.Name; Amount = amount; Crit = crit; Text = text;
+            ActorSide = actor?.Side ?? Side.Ally; ActorSlot = actor?.Slot ?? -1;
+            TargetSide = target?.Side ?? Side.Ally; TargetSlot = target?.Slot ?? -1;
+            var subject = target ?? actor;
+            HpAfter = subject?.Hp ?? -1; StunAfter = subject?.StunLeft ?? -1; PoisonAfter = subject?.PoisonStacks ?? -1;
+            Status = status; SkillName = skillName;
+            Guarded = target != null && target.Guarding && (kind == TurnLogKind.Attack || kind == TurnLogKind.Skill);
         }
 
         public override string ToString() => "W" + Wave + " R" + Round + " " + Text;
@@ -313,7 +339,7 @@ namespace TinyExpedition.Core.Battle
                 if (unit.StunLeft > 0)
                 {
                     unit.StunLeft--;
-                    Add(TurnLogKind.Stunned, unit.Name, null, 0, false, unit.Name + " 기절해서 움직이지 못함");
+                    Add(TurnLogKind.Stunned, unit, null, 0, false, unit.Name + " 기절해서 움직이지 못함");
                     EndTurn(unit, false);
                     continue;
                 }
@@ -342,11 +368,13 @@ namespace TinyExpedition.Core.Battle
             // 독은 라운드 끝에 모두 한꺼번에 받는다. 판정은 전부 받은 뒤에 한 번.
             foreach (var u in _allies.Concat(_enemies).Where(u => u.IsAlive && u.PoisonLeft > 0).ToList())
             {
-                int dmg = u.PoisonStacks * u.PoisonPower;
+                int stacks = u.PoisonStacks;
+                int dmg = stacks * u.PoisonPower;
                 u.Hp = Math.Max(0, u.Hp - dmg);
-                Add(TurnLogKind.PoisonTick, null, u.Name, dmg, false, u.Name + " 독 피해 " + dmg + " (" + u.PoisonStacks + "중첩) [남은 HP " + u.Hp + "]");
                 if (--u.PoisonLeft == 0) { u.PoisonStacks = 0; u.PoisonPower = 0; }
-                if (!u.IsAlive) Add(TurnLogKind.Defeated, null, u.Name, 0, false, u.Name + " 쓰러짐");
+                // 로그는 독이 풀린 뒤에 남긴다 (화면이 로그의 PoisonAfter만 보고 독 표시를 지울 수 있게). 글자는 피해를 준 중첩 수 그대로.
+                Add(TurnLogKind.PoisonTick, null, u, dmg, false, u.Name + " 독 피해 " + dmg + " (" + stacks + "중첩) [남은 HP " + u.Hp + "]");
+                if (!u.IsAlive) Add(TurnLogKind.Defeated, null, u, 0, false, u.Name + " 쓰러짐");
             }
             Judge();
         }
@@ -398,7 +426,7 @@ namespace TinyExpedition.Core.Battle
             {
                 case TurnActionKind.Guard:
                     actor.Guarding = true;
-                    Add(TurnLogKind.Guard, actor.Name, null, 0, false, actor.Name + " 방어");
+                    Add(TurnLogKind.Guard, actor, null, 0, false, actor.Name + " 방어");
                     break;
                 case TurnActionKind.Attack:
                     Hit(actor, foes[cmd.Target], 100, null, TurnLogKind.Attack);
@@ -425,12 +453,12 @@ namespace TinyExpedition.Core.Battle
             int dmg = BattleSimulator.CalcDamage((int)((long)actor.Atk * power / 100), target.Def, crit);
             if (target.Guarding) dmg = Math.Max(1, dmg / 2);
             target.Hp = Math.Max(0, target.Hp - dmg);
-            Add(kind, actor.Name, target.Name, dmg, crit,
+            Add(kind, actor, target, dmg, crit,
                 actor.Name + (skill != null ? " [" + skill.Name + "]" : "") + " → " + target.Name + " " + dmg
-                + (crit ? "(치명)" : "") + (target.Guarding ? "(방어)" : "") + " [남은 HP " + target.Hp + "]");
+                + (crit ? "(치명)" : "") + (target.Guarding ? "(방어)" : "") + " [남은 HP " + target.Hp + "]", StatusKind.None, skill?.Name);
             if (!target.IsAlive)
             {
-                Add(TurnLogKind.Defeated, actor.Name, target.Name, 0, false, target.Name + " 쓰러짐");
+                Add(TurnLogKind.Defeated, actor, target, 0, false, target.Name + " 쓰러짐");
                 return;
             }
             if (skill != null && skill.Status != StatusKind.None)
@@ -445,15 +473,15 @@ namespace TinyExpedition.Core.Battle
             if (skill.Status == StatusKind.Stun)
             {
                 target.StunLeft = Math.Max(target.StunLeft, skill.StatusTurns);
-                Add(TurnLogKind.StatusApplied, null, target.Name, target.StunLeft, false, target.Name + " 기절 (" + target.StunLeft + "차례)");
+                Add(TurnLogKind.StatusApplied, null, target, target.StunLeft, false, target.Name + " 기절 (" + target.StunLeft + "차례)", StatusKind.Stun);
             }
             else
             {
                 target.PoisonStacks = Math.Min(MaxPoisonStacks, target.PoisonStacks + 1);
                 target.PoisonLeft = Math.Max(target.PoisonLeft, skill.StatusTurns);
                 target.PoisonPower = Math.Max(target.PoisonPower, skill.StatusPower);
-                Add(TurnLogKind.StatusApplied, null, target.Name, target.PoisonStacks, false,
-                    target.Name + " 독 " + target.PoisonStacks + "중첩 (" + target.PoisonLeft + "라운드)");
+                Add(TurnLogKind.StatusApplied, null, target, target.PoisonStacks, false,
+                    target.Name + " 독 " + target.PoisonStacks + "중첩 (" + target.PoisonLeft + "라운드)", StatusKind.Poison);
             }
         }
 
@@ -463,11 +491,12 @@ namespace TinyExpedition.Core.Battle
             int amount = (int)((long)actor.Atk * skill.Power / 100);
             int before = target.Hp;
             target.Hp = Math.Min(target.MaxHp, target.Hp + amount);
-            Add(TurnLogKind.Heal, actor.Name, target.Name, target.Hp - before, false,
-                actor.Name + " [" + skill.Name + "] → " + target.Name + " 회복 " + (target.Hp - before) + " [HP " + target.Hp + "]");
+            Add(TurnLogKind.Heal, actor, target, target.Hp - before, false,
+                actor.Name + " [" + skill.Name + "] → " + target.Name + " 회복 " + (target.Hp - before) + " [HP " + target.Hp + "]", StatusKind.None, skill.Name);
         }
 
-        private void Add(TurnLogKind kind, string actor, string target, int amount, bool crit, string text) =>
-            _log.Add(new TurnLogEntry(Round, WaveIndex + 1, kind, actor, target, amount, crit, text));
+        private void Add(TurnLogKind kind, TurnUnit actor, TurnUnit target, int amount, bool crit, string text,
+            StatusKind status = StatusKind.None, string skillName = null) =>
+            _log.Add(new TurnLogEntry(Round, WaveIndex + 1, kind, actor, target, amount, crit, text, status, skillName));
     }
 }
