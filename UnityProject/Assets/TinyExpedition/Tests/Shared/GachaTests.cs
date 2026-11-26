@@ -115,6 +115,42 @@ namespace TinyExpedition.Tests
             Assert.That(results.Count(r => r.Reason == PullReason.TenPullGuarantee), Is.EqualTo(0));
         }
 
+        [Test, TC("GACHA-017")]
+        public void TenPull_CrossingHardPity_ResetsMidPull()
+        {
+            // 천장 카운트 85에서 10연: 5번째 장이 90번째 모집 → 3성 확정, 이후 카운트는 1부터 다시
+            var banner = TestData.Banner(0, 0, 10000, hardPity: 90);
+            var gacha = new GachaService(TestData.Db(new[] { banner }));
+            var pity = new PityState { PullsSinceThreeStar = 85 };
+
+            var results = gacha.PullTen(banner, pity, new Pcg32(5));
+
+            Assert.That(results.Select(r => r.PityCount), Is.EqualTo(new[] { 86, 87, 88, 89, 90, 1, 2, 3, 4, 5 }));
+            Assert.That(results[4].Rarity, Is.EqualTo(Rarity.ThreeStar));
+            Assert.That(results[4].Reason, Is.EqualTo(PullReason.HardPity));
+            Assert.That(results.Where((r, i) => i != 4).All(r => r.Rarity != Rarity.ThreeStar), Is.True,
+                "천장 3성은 5번째 장 하나뿐이어야 함");
+            Assert.That(pity.PullsSinceThreeStar, Is.EqualTo(5), "10연 뒤 카운트 = 천장 이후 5장");
+        }
+
+        [Test, TC("GACHA-018")]
+        public void TenPull_LastSlotHardPity_WinsOverGuarantee()
+        {
+            // 천장 카운트 80에서 10연: 앞 9장은 1성(2·3성 0%), 10번째 장이 90번째 모집
+            // → 10연 보정(2성)이 아니라 천장(3성)이 적용되어야 함
+            var banner = TestData.Banner(0, 0, 10000, hardPity: 90);
+            var gacha = new GachaService(TestData.Db(new[] { banner }));
+            var pity = new PityState { PullsSinceThreeStar = 80 };
+
+            var results = gacha.PullTen(banner, pity, new Pcg32(7));
+
+            Assert.That(results.Take(9).All(r => r.Rarity == Rarity.OneStar && r.Reason == PullReason.Normal), Is.True);
+            Assert.That(results[9].PityCount, Is.EqualTo(90));
+            Assert.That(results[9].Rarity, Is.EqualTo(Rarity.ThreeStar));
+            Assert.That(results[9].Reason, Is.EqualTo(PullReason.HardPity), "보정(TenPullGuarantee)이 아니라 천장");
+            Assert.That(pity.PullsSinceThreeStar, Is.EqualTo(0));
+        }
+
         [Test, TC("GACHA-013")]
         public void Duplicates_IncreaseOwnedCount()
         {
@@ -206,6 +242,24 @@ namespace TinyExpedition.Tests
             for (int i = 0; i < N; i++)
                 if (gacha.PullOne(banner, pity, rng).IsPickup) pickups++;
             Assert.That(pickups / (double)N, Is.EqualTo(0.5).Within(0.015));
+        }
+
+        [Test, TC("GACHA-016"), Category("Probability")]
+        public void HardPityThreeStar_AlsoRollsPickupShare()
+        {
+            // 천장으로 나온 3성도 픽업 50% 판정을 한다 (천장 = 픽업 확정이 아님). 매번 카운트 89에서 1회 모집.
+            var banner = TestData.Banner(0, 0, 10000, hardPity: 90, pickup: "three_pick", pickupShareBp: 5000);
+            var gacha = new GachaService(TestData.Db(new[] { banner }));
+            var rng = new Pcg32(2026);
+            const int N = 20000;
+            int pickups = 0;
+            for (int i = 0; i < N; i++)
+            {
+                var r = gacha.PullOne(banner, new PityState { PullsSinceThreeStar = 89 }, rng);
+                Assert.That(r.Reason, Is.EqualTo(PullReason.HardPity));
+                if (r.IsPickup) pickups++;
+            }
+            Assert.That(pickups / (double)N, Is.EqualTo(0.5).Within(0.015), "천장 3성 중 픽업 비율");
         }
 
         [Test, TC("GACHA-011"), Category("Probability")]
