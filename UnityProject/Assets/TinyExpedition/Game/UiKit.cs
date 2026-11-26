@@ -43,8 +43,9 @@ namespace TinyExpedition.Game
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             var scaler = go.GetComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1080, 1920);
-            scaler.matchWidthOrHeight = 0.5f;
+            // 가로 화면 기준. 세로 길이에 맞춰 늘려서 화면 비율이 달라도 위아래가 잘리지 않는다.
+            scaler.referenceResolution = new Vector2(1920, 1080);
+            scaler.matchWidthOrHeight = 1f;
 
             if (Object.FindAnyObjectByType<EventSystem>() == null)
             {
@@ -64,7 +65,7 @@ namespace TinyExpedition.Game
             return rt;
         }
 
-        public static RectTransform Column(string name, Transform parent, float spacing = 24, int padding = 48)
+        public static RectTransform Column(string name, Transform parent, float spacing = 14, int padding = 28)
         {
             var go = new GameObject(name, typeof(RectTransform), typeof(VerticalLayoutGroup));
             go.transform.SetParent(parent, false);
@@ -81,7 +82,7 @@ namespace TinyExpedition.Game
             return rt;
         }
 
-        public static RectTransform Row(string name, Transform parent, float spacing = 16, float height = 140)
+        public static RectTransform Row(string name, Transform parent, float spacing = 16, float height = 104)
         {
             var go = new GameObject(name, typeof(RectTransform), typeof(HorizontalLayoutGroup), typeof(LayoutElement));
             go.transform.SetParent(parent, false);
@@ -93,6 +94,7 @@ namespace TinyExpedition.Game
             layout.childForceExpandHeight = true;
             layout.childForceExpandWidth = true;
             go.GetComponent<LayoutElement>().preferredHeight = height;
+            go.GetComponent<LayoutElement>().flexibleHeight = 0; // 남는 세로 공간을 줄이 가져가지 않게 (가져가면 화면 내용이 아래로 밀린다)
             return (RectTransform)go.transform;
         }
 
@@ -113,17 +115,44 @@ namespace TinyExpedition.Game
             return t;
         }
 
-        public static Button Button(string name, Transform parent, string text, UnityAction onClick, Color? color = null, float height = 140)
+        public static Button Button(string name, Transform parent, string text, UnityAction onClick, Color? color = null, float height = 104)
         {
             var go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(UnityEngine.UI.Button), typeof(LayoutElement));
             go.transform.SetParent(parent, false);
             go.GetComponent<Image>().color = color ?? Accent;
+            Round(go.GetComponent<Image>());
             go.GetComponent<LayoutElement>().preferredHeight = height;
             var b = go.GetComponent<UnityEngine.UI.Button>();
             b.onClick.AddListener(onClick);
             var label = Label("Text", go.transform, text, 46);
             Stretch((RectTransform)label.transform);
             return b;
+        }
+
+        private static Sprite _rounded;
+
+        /// <summary>모서리가 둥근 9분할 그림을 입힌다 (그림 파일 없이 코드로 만든다).</summary>
+        public static void Round(Image image)
+        {
+            if (_rounded == null)
+            {
+                const int size = 64, r = 22;
+                var tex = new Texture2D(size, size, TextureFormat.RGBA32, false) { name = "Rounded", wrapMode = TextureWrapMode.Clamp };
+                var px = new Color[size * size];
+                for (int y = 0; y < size; y++)
+                    for (int x = 0; x < size; x++)
+                    {
+                        float qx = Mathf.Abs(x + 0.5f - size / 2f) - (size / 2f - r), qy = Mathf.Abs(y + 0.5f - size / 2f) - (size / 2f - r);
+                        float d = new Vector2(Mathf.Max(qx, 0), Mathf.Max(qy, 0)).magnitude - r;
+                        px[y * size + x] = new Color(1, 1, 1, Mathf.Clamp01(0.5f - d));
+                    }
+                tex.SetPixels(px);
+                tex.Apply();
+                _rounded = Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100, 0, SpriteMeshType.FullRect, new Vector4(r + 2, r + 2, r + 2, r + 2));
+                _rounded.name = "Rounded";
+            }
+            image.sprite = _rounded;
+            image.type = Image.Type.Sliced;
         }
 
         public static void Stretch(RectTransform rt)

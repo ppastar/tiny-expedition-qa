@@ -32,7 +32,7 @@ namespace TinyExpedition.Game
             _startTime = Time.realtimeSinceStartupAsDouble;
             Clock = () => Time.realtimeSinceStartupAsDouble - _startTime;
 
-            var col = UiKit.Column("Col", transform, 24, 0);
+            var col = UiKit.Column("Col", transform, 16, 0);
             _status = UiKit.Label("Label_Round", col, "", 40);
             _feedback = UiKit.Label("Label_Judgement", col, "준비", 64, UiKit.Gold, TextAnchor.MiddleCenter, 110);
 
@@ -55,7 +55,7 @@ namespace TinyExpedition.Game
             _marker.anchorMax = new Vector2(0, 1);
             _marker.sizeDelta = new Vector2(16, 0);
 
-            TapButton = UiKit.Button("Btn_Tap", col, "탭!", Tap, UiKit.Accent, 260);
+            TapButton = UiKit.Button("Btn_Tap", col, "탭!", Tap, UiKit.Accent, 200);
             UpdateStatus();
         }
 

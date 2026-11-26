@@ -122,12 +122,18 @@ namespace TinyExpedition.Game
 
         // ---------------- 화면 ----------------
 
-        private Transform BeginScreen(string name)
+        /// <param name="width">화면 가운데에 놓는 내용 폭 (기준 해상도 1920 가로).</param>
+        private RectTransform BeginScreen(string name, float width = 1100)
         {
             UiKit.Clear(_root);
+            DestroyBattleStage();
+            _root.GetComponent<Image>().enabled = true;
             CurrentScreen = name;
             var col = UiKit.Column("Screen_" + name, _root);
-            var header = UiKit.Row("Header", col, 16, 90);
+            col.anchorMin = new Vector2(0.5f, 0);
+            col.anchorMax = new Vector2(0.5f, 1);
+            col.sizeDelta = new Vector2(width, 0);
+            var header = UiKit.Row("Header", col, 16, 80);
             UiKit.Label("Label_Title", header, "작은 원정대", 40, UiKit.Muted, TextAnchor.MiddleLeft);
             _gemsLabel = UiKit.Label("Label_Gems", header, "", 44, UiKit.Gold, TextAnchor.MiddleRight);
             RefreshGems();
@@ -144,16 +150,20 @@ namespace TinyExpedition.Game
             var col = BeginScreen("Home");
             var banner = Session.Db.GetBanner(MainBannerId);
             Session.State.Pity.TryGetValue(banner.Id, out var pity);
-            UiKit.Label("Label_Banner", col, banner.Name, 64, UiKit.TextColor, TextAnchor.MiddleCenter, 160);
+            UiKit.Label("Label_Banner", col, banner.Name, 64, UiKit.TextColor, TextAnchor.MiddleCenter, 120);
             UiKit.Label("Label_Pity", col, "천장까지 " + (banner.HardPity - (pity?.PullsSinceThreeStar ?? 0)) + "회", 36, UiKit.Muted);
-            UiKit.Button("Btn_Pull1", col, "1회 모집 (" + banner.CostPerPull + ")", () => DoPull(1));
-            UiKit.Button("Btn_Pull10", col, "10회 모집 (" + banner.CostPerPull * 10 + ")", () => DoPull(10));
-            UiKit.Button("Btn_Stages", col, "원정 떠나기", ShowStages, UiKit.Panel);
-            UiKit.Button("Btn_TurnBattle", col, "턴제 전투: 동굴 탐험", ShowTurnStages, UiKit.Panel);
-            UiKit.Button("Btn_MiniGame", col, "미니게임: 별빛 타이밍", ShowMiniGame, UiKit.Panel);
-            UiKit.Button("Btn_Roster", col, "보유 캐릭터 (" + Session.State.Owned.Count + ")", ShowRoster, UiKit.Panel);
+            // 가로 화면: 버튼을 두 개씩 나란히
+            var pulls = UiKit.Row("Row_Pull", col, 16, 120);
+            UiKit.Button("Btn_Pull1", pulls, "1회 모집 (" + banner.CostPerPull + ")", () => DoPull(1));
+            UiKit.Button("Btn_Pull10", pulls, "10회 모집 (" + banner.CostPerPull * 10 + ")", () => DoPull(10));
+            var modes = UiKit.Row("Row_Modes", col, 16, 120);
+            UiKit.Button("Btn_Stages", modes, "원정 떠나기", ShowStages, UiKit.Panel);
+            UiKit.Button("Btn_TurnBattle", modes, "턴제 전투: 동굴 탐험", ShowTurnStages, UiKit.Panel);
+            var etc = UiKit.Row("Row_Etc", col, 16, 120);
+            UiKit.Button("Btn_MiniGame", etc, "미니게임: 별빛 타이밍", ShowMiniGame, UiKit.Panel);
+            UiKit.Button("Btn_Roster", etc, "보유 캐릭터 (" + Session.State.Owned.Count + ")", ShowRoster, UiKit.Panel);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            UiKit.Button("Btn_Debug", col, "QA 디버그 패널", ShowDebug, new Color(0.35f, 0.2f, 0.2f), 100);
+            UiKit.Button("Btn_Debug", col, "QA 디버그 패널", ShowDebug, new Color(0.35f, 0.2f, 0.2f), 84);
 #endif
         }
 
@@ -171,15 +181,15 @@ namespace TinyExpedition.Game
 
         public void ShowPullResult(IReadOnlyList<PullResult> results)
         {
-            var col = BeginScreen("PullResult");
+            var col = BeginScreen("PullResult", 1800);
             UiKit.Label("Label_ResultTitle", col, "모집 결과", 56);
             var grid = new GameObject("Grid_Results", typeof(RectTransform), typeof(GridLayoutGroup), typeof(LayoutElement));
             grid.transform.SetParent(col, false);
             var g = grid.GetComponent<GridLayoutGroup>();
-            g.cellSize = new Vector2(180, 260);
+            g.cellSize = new Vector2(160, 232); // 10장이 한 줄에
             g.spacing = new Vector2(12, 12);
             g.childAlignment = TextAnchor.UpperCenter;
-            grid.GetComponent<LayoutElement>().preferredHeight = results.Count > 5 ? 540 : 270;
+            grid.GetComponent<LayoutElement>().preferredHeight = 250;
             for (int i = 0; i < results.Count; i++) CharacterCard("Card_" + i, grid.transform, results[i]);
             UiKit.Button("Btn_Back", col, "확인", ShowHome);
         }
@@ -209,6 +219,7 @@ namespace TinyExpedition.Game
         public void ShowRoster()
         {
             var col = BeginScreen("Roster");
+            col.GetComponent<VerticalLayoutGroup>().spacing = 6;
             foreach (var def in Session.Db.Characters.OrderByDescending(c => c.Rarity))
             {
                 Session.State.Owned.TryGetValue(def.Id, out int n);
@@ -252,9 +263,9 @@ namespace TinyExpedition.Game
             var col = BeginScreen("BattleResult");
             var res = r.Value;
             UiKit.Label("Label_Outcome", col, res.Outcome == BattleOutcome.Victory ? "승리! " + new string('★', res.Stars) : res.Outcome == BattleOutcome.Timeout ? "시간 초과" : "패배",
-                72, res.Outcome == BattleOutcome.Victory ? UiKit.Gold : UiKit.Muted, TextAnchor.MiddleCenter, 160);
-            foreach (var e in res.Log.Skip(Math.Max(0, res.Log.Count - 12)))
-                UiKit.Label("Log", col, e.ToString(), 28, UiKit.Muted, TextAnchor.MiddleLeft, 44);
+                72, res.Outcome == BattleOutcome.Victory ? UiKit.Gold : UiKit.Muted, TextAnchor.MiddleCenter, 120);
+            foreach (var e in res.Log.Skip(Math.Max(0, res.Log.Count - 9)))
+                UiKit.Label("Log", col, e.ToString(), 28, UiKit.Muted, TextAnchor.MiddleLeft, 40);
             UiKit.Button("Btn_Back", col, "확인", ShowStages);
         }
 
@@ -265,10 +276,10 @@ namespace TinyExpedition.Game
             UiKit.Label("Label_Help", col, "막대가 가운데 금색 구간에 올 때 탭!  (스페이스바도 가능)", 32, UiKit.Muted);
             var area = new GameObject("MiniGameArea", typeof(RectTransform), typeof(LayoutElement));
             area.transform.SetParent(col, false);
-            area.GetComponent<LayoutElement>().preferredHeight = 700;
+            area.GetComponent<LayoutElement>().preferredHeight = 600;
             _miniGameView = area.AddComponent<MiniGameView>();
             _miniGameView.Build(_miniGame, OnMiniGameFinished);
-            UiKit.Button("Btn_Back", col, "그만하기", ShowHome, UiKit.Panel, 100);
+            UiKit.Button("Btn_Back", col, "그만하기", ShowHome, UiKit.Panel, 84);
         }
 
         private void OnMiniGameFinished(TimingTapGame game)
@@ -276,7 +287,7 @@ namespace TinyExpedition.Game
             int gems = Session.ClaimMiniGame(game);
             Save();
             var col = BeginScreen("MiniGameResult");
-            UiKit.Label("Label_Score", col, "점수 " + game.Score, 72, UiKit.Gold, TextAnchor.MiddleCenter, 160);
+            UiKit.Label("Label_Score", col, "점수 " + game.Score, 72, UiKit.Gold, TextAnchor.MiddleCenter, 120);
             UiKit.Label("Label_Detail", col,
                 "Perfect " + game.Taps.Count(t => t.Judgement == Judgement.Perfect) + " · Good " + game.Taps.Count(t => t.Judgement == Judgement.Good)
                 + " · Miss " + game.Taps.Count(t => t.Judgement == Judgement.Miss) + " · 최대 콤보 " + game.MaxCombo, 36);
@@ -294,25 +305,25 @@ namespace TinyExpedition.Game
         {
             var col = BeginScreen("Debug");
             UiKit.Label("Label_Seed", col, "현재 시드 " + Session.State.RngSeed, 32, UiKit.Muted);
-            UiKit.Button("Btn_Dbg_Seed", col, "시드 42로 고정", () => { Session.Reseed(42); ShowDebug(); }, UiKit.Panel, 110);
-            UiKit.Button("Btn_Dbg_Gems", col, "보석 +10,000", () => { Session.State.Gems += 10000; ShowDebug(); }, UiKit.Panel, 110);
+            UiKit.Button("Btn_Dbg_Seed", col, "시드 42로 고정", () => { Session.Reseed(42); ShowDebug(); }, UiKit.Panel, 88);
+            UiKit.Button("Btn_Dbg_Gems", col, "보석 +10,000", () => { Session.State.Gems += 10000; ShowDebug(); }, UiKit.Panel, 88);
             UiKit.Button("Btn_Dbg_Pity", col, "천장 직전(89회)으로", () =>
             {
                 Session.State.Pity[MainBannerId] = new PityState { PullsSinceThreeStar = 89 };
                 Toast("다음 모집이 천장입니다.");
-            }, UiKit.Panel, 110);
+            }, UiKit.Panel, 88);
             UiKit.Button("Btn_Dbg_Unlock", col, "모든 스테이지 열기", () =>
             {
                 foreach (var s in Session.Db.Stages)
                     if (!Session.State.ClearedStages.ContainsKey(s.Id)) Session.State.ClearedStages[s.Id] = 1;
                 Toast("모든 스테이지를 열었습니다.");
-            }, UiKit.Panel, 110);
+            }, UiKit.Panel, 88);
             UiKit.Button("Btn_Dbg_Reset", col, "세이브 초기화", () =>
             {
                 Session = new GameSession(Session.Db, new PlayerState());
                 Save();
                 ShowDebug();
-            }, new Color(0.5f, 0.2f, 0.2f), 110);
+            }, new Color(0.5f, 0.2f, 0.2f), 88);
             UiKit.Button("Btn_Back", col, "돌아가기", ShowHome);
         }
 #endif

@@ -495,4 +495,148 @@ namespace TinyExpedition.Tests
             Assert.That(Errors(Db(null, new[] { a, b, c })).Any(x => x.Contains("turn-stages/tb") && x.Contains("순환")), Is.True);
         }
     }
+
+    /// <summary>
+    /// 화면 상태(TurnBattleDisplay) 테스트. 2.5D 전투 화면은 Core 값을 직접 읽지 않고 로그를 재생한 결과만 그리므로,
+    /// "로그를 다 재생하면 Core와 같다"가 깨지면 화면에 틀린 HP·상태가 보인다.
+    /// </summary>
+    public class TurnDisplayTests
+    {
+        /// <summary>자동 명령만 쓰면 방어가 한 번도 안 나오므로, 시드로 공격·스킬·방어를 섞는다.</summary>
+        private static TurnCommand MixedCommand(TurnBattle b, TinyExpedition.Core.Random.IRandom rng)
+        {
+            int roll = rng.NextInt(10);
+            if (roll < 2) return TurnCommand.Guard();
+            if (roll < 5)
+            {
+                var alive = b.Enemies.Where(e => e.IsAlive).ToList();
+                return TurnCommand.Attack(alive[rng.NextInt(alive.Count)].Slot);
+            }
+            return b.AutoCommand();
+        }
+
+        [Test, TC("TURN-025")]
+        public void Display_AfterReplayingLog_MatchesCore_EveryCommand()
+        {
+            var db = TestData.LoadReal();
+            var parties = new[]
+            {
+                new[] { "c_lumi", "c_kai", "c_ella" },      // 전체 공격 · 단일 · 전체 회복
+                new[] { "c_moss", "c_reed", "c_mushroom" }, // 독 · 기절 · 단일 회복
+                new[] { "c_pebble", "c_firefly", "c_acorn" },
+                new[] { "c_acorn" },                         // 지는 판
+            };
+            int battles = 0, commands = 0, guards = 0, defeats = 0;
+            foreach (var stage in db.TurnStages)
+                foreach (var ids in parties)
+                    for (ulong seed = 1; seed <= 25; seed++)
+                    {
+                        var party = ids.Select(db.GetCharacter).ToList();
+                        var b = new TurnBattle(party, stage, db, seed);
+                        var view = new TurnBattleDisplay(b);
+                        var rng = new TinyExpedition.Core.Random.Pcg32(seed * 31 + 7);
+                        string where = stage.Id + " " + string.Join(",", ids) + " seed " + seed;
+
+                        view.StepAll();
+                        Assert.That(view.Mismatches(), Is.Empty, where + " 시작");
+                        while (!b.IsOver)
+                        {
+                            var cmd = MixedCommand(b, rng);
+                            Assert.That(b.Submit(cmd), Is.EqualTo(TurnCommandError.None), where);
+                            if (cmd.Kind == TurnActionKind.Guard) guards++;
+                            commands++;
+                            view.StepAll();
+                            Assert.That(view.Mismatches(), Is.Empty, where + " 명령 " + b.Commands.Count + " (" + cmd + ")");
+                        }
+                        Assert.That(view.Finished, Is.True, where);
+                        if (b.Outcome != TurnOutcome.Victory) defeats++;
+                        battles++;
+                    }
+            // 전제: 방어·패배가 실제로 섞인 표본이어야 이 테스트가 뜻이 있다
+            Assert.That(battles, Is.EqualTo(db.TurnStages.Count * parties.Length * 25));
+            Assert.That(guards, Is.GreaterThan(100));
+            Assert.That(defeats, Is.GreaterThan(0));
+            Assert.That(commands, Is.GreaterThan(battles * 3));
+        }
+
+        [Test, TC("TURN-026")]
+        public void Display_ShowsNothingAheadOfPlayback_AndFindsSameNameUnitsBySlot()
+        {
+            // 이름이 같은 적 둘. 화면이 이름으로 유닛을 찾으면 엉뚱한 쪽 HP가 깎인다.
+            var b = Turn.Battle(new[] { Turn.Ally("hero", atk: 60, spd: 100) }, null,
+                Turn.Wave(Turn.Foe("bat", hp: 100, atk: 10, spd: 50), Turn.Foe("bat", hp: 100, atk: 10, spd: 40)));
+            var view = new TurnBattleDisplay(b);
+            Assert.That(view.HasPending, Is.False, "아군이 먼저라 시작 로그 없음");
+
+            b.Submit(TurnCommand.Attack(1));
+            // Core는 이미 적 차례까지 계산을 끝냈지만, 화면은 한 줄도 재생하지 않았으니 처음 그대로여야 한다
+            Assert.That(b.Enemies[1].Hp, Is.EqualTo(40));
+            Assert.That(b.Allies[0].Hp, Is.EqualTo(480));
+            Assert.That(view.Enemies.Select(e => e.Hp), Is.EqualTo(new[] { 100, 100 }));
+            Assert.That(view.Allies[0].Hp, Is.EqualTo(500));
+            Assert.That(view.Mismatches().Single(), Does.Contain("재생하지 않은 로그 3줄"));
+
+            var first = view.Step();
+            Assert.That(first.Kind, Is.EqualTo(TurnLogKind.Attack));
+            Assert.That((first.TargetSide, first.TargetSlot, first.HpAfter), Is.EqualTo((Side.Enemy, 1, 40)));
+            Assert.That(view.Enemies.Select(e => e.Hp), Is.EqualTo(new[] { 100, 40 }), "2번째 박쥐만 깎임");
+            Assert.That(view.Allies[0].Hp, Is.EqualTo(500), "적의 반격은 아직 재생 전");
+
+            view.Step();
+            Assert.That(view.Allies[0].Hp, Is.EqualTo(490));
+            view.Step();
+            Assert.That(view.Allies[0].Hp, Is.EqualTo(480));
+            Assert.That(view.HasPending, Is.False);
+            Assert.That(view.Mismatches(), Is.Empty);
+        }
+
+        [Test, TC("TURN-027")]
+        public void Display_WaveChange_StatusAndGuard_FollowLog()
+        {
+            var skills = new[]
+            {
+                Turn.Skill("venom", status: StatusKind.Poison, power: 10, turns: 2, statusPower: 5),
+                Turn.Skill("bonk", status: StatusKind.Stun, power: 10, turns: 1, cooldown: 9),
+            };
+            var b = Turn.Battle(new[] { Turn.Ally("tank", hp: 900, atk: 200, spd: 100), Turn.Ally("mage", hp: 900, atk: 10, spd: 90, skill: "bonk") }, skills,
+                Turn.Wave(Turn.Foe("spider", hp: 150, atk: 10, spd: 95, skill: "venom")),
+                Turn.Wave(Turn.Foe("slime", hp: 400, atk: 10, spd: 50), Turn.Foe("slime", hp: 400, atk: 10, spd: 40)));
+            var view = new TurnBattleDisplay(b);
+
+            b.Submit(TurnCommand.Guard());                 // tank 방어 → spider가 tank에게 독 (HP 낮은 순, 동률이면 앞 슬롯)
+            view.StepAll();
+            Assert.That(view.Allies[0].Guarding, Is.True);
+            Assert.That(view.Allies[0].PoisonStacks, Is.EqualTo(1));
+            Assert.That(view.Mismatches(), Is.Empty);
+
+            b.Submit(TurnCommand.Attack(0));               // mage 공격 → 라운드 끝 독 피해 → R2 tank 차례
+            view.StepAll();
+            Assert.That(view.Mismatches(), Is.Empty);
+            Assert.That(view.Allies[0].Guarding, Is.False, "자기 차례가 오면 방어 표시가 사라짐");
+
+            b.Submit(TurnCommand.Attack(0));               // tank가 spider 처치 → 웨이브 2
+            // 웨이브 정리 줄을 재생하기 전까지는 화면에 쓰러진 1웨이브 적이 남아 있어야 한다
+            while (view.Peek().Kind != TurnLogKind.WaveCleared) view.Step();
+            Assert.That(view.WaveIndex, Is.EqualTo(0));
+            Assert.That(view.Enemies.Single().IsAlive, Is.False);
+            Assert.That(view.Allies[0].PoisonStacks, Is.EqualTo(1), "독은 웨이브가 바뀔 때 풀림");
+
+            view.Step();
+            Assert.That(view.WaveIndex, Is.EqualTo(1));
+            Assert.That(view.Enemies.Select(e => (e.Name, e.Hp, e.Wave)), Is.EqualTo(new[] { ("slime", 400, 2), ("slime", 400, 2) }));
+            Assert.That(view.Allies[0].PoisonStacks, Is.EqualTo(0));
+            view.StepAll();
+            Assert.That(view.Mismatches(), Is.Empty);
+
+            while (b.CurrentActor.Name != "mage") b.Submit(TurnCommand.Guard());
+            b.Submit(TurnCommand.UseSkill(1));             // 2번째 slime 기절
+            view.StepAll();
+            Assert.That(b.Log.Last(e => e.Kind == TurnLogKind.StatusApplied).Status, Is.EqualTo(StatusKind.Stun));
+            Assert.That(view.Mismatches(), Is.Empty);
+            b.RunAuto();
+            view.StepAll();
+            Assert.That(view.Finished, Is.True);
+            Assert.That(view.Mismatches(), Is.Empty);
+        }
+    }
 }

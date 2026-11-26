@@ -83,6 +83,17 @@ MUTATIONS = [
      "battle.RewardClaimed = true;\n            _turnBattles.Remove(battle);", ""),
     ("[턴제] 첫 클리어가 아니어도 보석 지급", "GameSession.cs",
      "(firstClear ? battle.Stage.FirstClearGems : 0)", "battle.Stage.FirstClearGems"),
+    # --- 턴제 전투 화면 상태 (2.5D 무대가 그리는 값) ---
+    ("[턴제 화면] 로그에 대상 슬롯 대신 항상 0번을 적음 (이름이 같은 적 중 엉뚱한 쪽 HP가 깎여 보임)", "Battle/TurnBattle.cs",
+     "TargetSide = target?.Side ?? Side.Ally; TargetSlot = target?.Slot ?? -1;", "TargetSide = target?.Side ?? Side.Ally; TargetSlot = target != null ? 0 : -1;"),
+    ("[턴제 화면] 로그의 독 중첩 칸에 남은 라운드 수를 적음 (화면의 독 표시가 실제와 다름)", "Battle/TurnBattle.cs",
+     "PoisonAfter = subject?.PoisonStacks ?? -1;", "PoisonAfter = subject?.PoisonLeft ?? -1;"),
+    ("[턴제 화면] 방어 표시가 다음 차례에도 안 사라짐", "Battle/TurnBattleDisplay.cs",
+     "actor.Guarding = e.Kind == TurnLogKind.Guard;", "actor.Guarding |= e.Kind == TurnLogKind.Guard;"),
+    ("[턴제 화면] 웨이브가 바뀌어도 화면의 아군 상태이상 표시가 남음", "Battle/TurnBattleDisplay.cs",
+     "foreach (var a in _allies) { a.StunLeft = 0; a.PoisonStacks = 0; a.Guarding = false; }", ""),
+    ("[턴제 화면] 다음 웨이브 적을 세우지 않음 (이전 웨이브 적이 그대로 보임)", "Battle/TurnBattleDisplay.cs",
+     "_enemies = Spawn(WaveIndex);", ""),
     # --- qa-tool (BUG-003) ---
     ("[qa-tool] 시드를 long으로 읽음 (long 최대값보다 큰 시드 거부, 음수는 큰 시드로 바뀜)", "dotnet/QaTool/Common.cs",
      "return ulong.TryParse(v.Replace(\"_\", \"\"), out var n) ? n :",
