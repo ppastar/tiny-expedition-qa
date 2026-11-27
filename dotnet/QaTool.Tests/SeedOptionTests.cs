@@ -63,7 +63,7 @@ namespace TinyExpedition.QaTool.Tests
             Assert.That(Opts("--seed", text).GetULong("seed", 1), Is.EqualTo(expected));
         }
 
-        // 실제 빌드 자동 플레이 결과 화면(docs/reports/autoplay/11-turn-result.png)에 찍힌 명령줄 그대로.
+        // 실제 빌드 자동 플레이 결과 화면(docs/bug-reports/attachments/BUG-003-turn-result.png)에 찍힌 명령줄 그대로.
         // 이 시드(9969530186747707812)가 long 최대값보다 커서 BUG-003이 드러났다.
         private const string AutoplaySeed = "9969530186747707812";
         private const string AutoplayCommands =

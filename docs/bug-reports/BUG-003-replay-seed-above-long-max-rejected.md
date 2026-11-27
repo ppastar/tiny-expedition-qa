@@ -25,7 +25,7 @@
 ## 사전조건
 
 - 턴제 T-1을 한 판 끝낸 결과 화면(또는 `Player.log`의 `[TurnReplay]` 줄)에 찍힌 리플레이 명령줄.
-- 그 판의 시드가 long 최대값(9223372036854775807)보다 큼. 여기서는 자동 플레이 스크린샷 [`11-turn-result.png`](../reports/autoplay/11-turn-result.png)의 시드 **9969530186747707812**.
+- 그 판의 시드가 long 최대값(9223372036854775807)보다 큼. 여기서는 당시 자동 플레이 스크린샷 [`BUG-003-turn-result.png`](attachments/BUG-003-turn-result.png)의 시드 **9969530186747707812**.
 
 게임은 행동이 끝날 때마다 32비트 난수 두 개를 이어 붙여 다음 시드를 만듭니다(`GameSession.AdvanceSeed`). 즉 시드는 ulong 전체 범위에 고르게 퍼지고, 맨 위 비트가 1인 시드(= long 최대값 초과)는 **절반**입니다. 특별한 조건이 아니라 두 판에 한 판꼴로 만나는 값입니다.
 
@@ -72,7 +72,7 @@
 
 ### 결과 화면 (자동 플레이 스크린샷)
 
-[`docs/reports/autoplay/11-turn-result.png`](../reports/autoplay/11-turn-result.png) — 화면 아래쪽 "리플레이:" 줄:
+[`attachments/BUG-003-turn-result.png`](attachments/BUG-003-turn-result.png) (발견 당시 자동 플레이가 `docs/reports/autoplay/11-turn-result.png`로 남긴 화면. 이후 2.5D 화면으로 바뀌며 그 폴더의 스크린샷이 교체되어 여기에 보관) — 화면 아래쪽 "리플레이:" 줄:
 
 ```
 qa turn-replay --stage T-1 --party c_firefly,c_mushroom,c_moss --seed 9969530186747707812 --commands A1,A1,S0,S0,A1,A1,A0,A0,A0,A1,S0,A1,A1,A1,S0,S0,A0,A0,A0,S0,A0,A0,A0,A0,A0,A0,S0,S0,S0,A0,A0,A0,A0,A0,A0,A0,S0,A0,S0,A0,S0
