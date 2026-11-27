@@ -29,6 +29,7 @@ namespace TinyExpedition.Tests.PlayMode
         [TearDown]
         public void TearDown()
         {
+            TinyExpedition.Game.Battle.BattleArt.ArtDir = null; // 그림 폴더를 바꾼 테스트가 있으면 원래대로
             if (_app != null) Object.Destroy(_app.gameObject);
             foreach (var es in Object.FindObjectsByType<UnityEngine.EventSystems.EventSystem>())
                 Object.Destroy(es.gameObject);
@@ -195,6 +196,61 @@ namespace TinyExpedition.Tests.PlayMode
             Assert.That(_app.Session.State.Gems, Is.EqualTo(gemsBefore));
             Assert.That(_app.Session.State.ClearedTurnStages, Is.Empty);
             Assert.That(_app.CurrentTurnBattle, Is.Null);
+        }
+
+        // ---------------- 전투 그림 (일러스트 / 누락 시 기본 그림) ----------------
+
+        [UnityTest, Property("TC", "ART-006")]
+        public IEnumerator MissingBattleArt_FallsBackToDrawnArt_AndBattleStillRuns()
+        {
+            var empty = Path.Combine(_tempDir, "no-art");
+            Directory.CreateDirectory(empty);
+            TinyExpedition.Game.Battle.BattleArt.ArtDir = empty;
+
+            yield return EnterTurnBattle();
+            var battle = _app.CurrentTurnBattle;
+            var stage = _app.Stage;
+            for (int i = 0; i < battle.Allies.Count; i++)
+            {
+                Assert.That(stage.IsIllustrated(TinyExpedition.Core.Battle.Side.Ally, i), Is.False, "아군 " + i);
+                Assert.That(stage.LayerCount(TinyExpedition.Core.Battle.Side.Ally, i), Is.EqualTo(1), "기본 그림은 한 장");
+                Assert.That(stage.IsShownStanding(TinyExpedition.Core.Battle.Side.Ally, i), Is.True);
+            }
+            for (int i = 0; i < battle.Enemies.Count; i++)
+            {
+                Assert.That(stage.IsIllustrated(TinyExpedition.Core.Battle.Side.Enemy, i), Is.False, "적 " + i);
+                Assert.That(stage.IsShownStanding(TinyExpedition.Core.Battle.Side.Enemy, i), Is.True);
+            }
+            Assert.That(TinyExpedition.Game.Battle.BattleArt.MissingArt, Has.Member("e_bat"), "빠진 그림은 목록에 남아야 함");
+
+            // 그림이 없어도 전투는 끝까지 간다
+            yield return null;
+            Btn("Btn_AutoAll").onClick.Invoke();
+            yield return null;
+            Assert.That(_app.CurrentScreen, Is.EqualTo("TurnResult"));
+            Assert.That(battle.IsOver, Is.True);
+            // 오류·예외 로그가 있으면 테스트 러너가 실패시킨다 (결과 화면의 [TurnReplay] 안내 로그는 정상)
+        }
+
+        [UnityTest, Property("TC", "ART-007")]
+        public IEnumerator BattleArt_UsesIllustrationWithParts()
+        {
+            yield return EnterTurnBattle();
+            var battle = _app.CurrentTurnBattle;
+            var stage = _app.Stage;
+            for (int i = 0; i < battle.Allies.Count; i++)
+            {
+                Assert.That(stage.IsIllustrated(TinyExpedition.Core.Battle.Side.Ally, i), Is.True, "아군 " + i + " " + battle.Allies[i].Name);
+                Assert.That(stage.LayerCount(TinyExpedition.Core.Battle.Side.Ally, i), Is.GreaterThanOrEqualTo(2), "몸과 머리가 따로 있어야 움직임이 붙는다");
+            }
+            for (int i = 0; i < battle.Enemies.Count; i++)
+                Assert.That(stage.IsIllustrated(TinyExpedition.Core.Battle.Side.Enemy, i), Is.True, "적 " + i + " " + battle.Enemies[i].Name);
+            Assert.That(TinyExpedition.Game.Battle.BattleArt.MissingArt, Is.Empty);
+
+            // 부위 움직임(까딱임·깜빡임·날갯짓)이 도는 동안 오류가 없어야 한다
+            for (int f = 0; f < 30; f++) yield return null;
+            Assert.That(stage.MismatchCount, Is.EqualTo(0));
+            LogAssert.NoUnexpectedReceived();
         }
 
         // ---------------- 2.5D 전투 무대 ----------------

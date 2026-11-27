@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 280" data-ppu="150" data-neck="240 240" stroke-linejoin="round" stroke-linecap="round">
+  <!-- 달팽이: 크림색 몸, 회색 돌 껍데기. 원본은 오른쪽을 본다(게임에서 좌우 반전되어 아군 쪽을 본다) -->
+  <defs>
+    <radialGradient id="shellG" cx="38%" cy="26%" r="85%"><stop offset="0" stop-color="#c3cad6"/><stop offset=".6" stop-color="#9aa3b4"/><stop offset="1" stop-color="#737c90"/></radialGradient>
+    <linearGradient id="skinG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbe9bb"/><stop offset="1" stop-color="#e8c888"/></linearGradient>
+    <path id="shell" d="M132 32 C150 30 160 36 172 40 C204 50 234 84 236 132 C238 168 226 196 208 214 C196 228 176 238 150 240 C96 244 44 216 32 160 C28 140 30 122 36 106 C40 96 38 90 46 78 C62 52 94 34 132 32 Z"/>
+    <path id="foot" d="M22 252 C16 234 34 224 64 224 L262 224 C296 224 320 234 320 250 C320 262 304 266 284 266 L52 266 C36 266 26 262 22 252 Z"/>
+    <path id="headFill" d="M214 262 C204 222 208 186 232 172 C258 158 292 172 300 204 C306 230 296 254 278 264 Z"/>
+    <clipPath id="c-shell"><use href="#shell"/></clipPath>
+    <clipPath id="c-foot"><use href="#foot"/></clipPath>
+    <clipPath id="c-head"><use href="#headFill"/></clipPath>
+  </defs>
+
+  <g id="L-body">
+    <!-- 배발 -->
+    <use href="#foot" fill="url(#skinG)"/>
+    <g clip-path="url(#c-foot)">
+      <path d="M10 254 H330 V270 H10Z" fill="#cfa868" opacity=".55"/>
+      <path d="M60 232 C120 228 180 228 240 232" fill="none" stroke="#fff6d8" stroke-width="5" opacity=".7"/>
+    </g>
+    <use href="#foot" fill="none" stroke="#7a5a2c" stroke-width="5"/>
+    <path d="M70 258 q8 -6 16 0 M120 258 q8 -6 16 0 M170 258 q8 -6 16 0" fill="none" stroke="#b08a4c" stroke-width="2.4"/>
+    <!-- 껍데기 뒤쪽 돌 가시 -->
+    <path d="M42 96 L14 84 L34 122 Z M70 52 L56 22 L96 40 Z" fill="#737c90" stroke="#343a4c" stroke-width="4.6"/>
+    <!-- 돌 껍데기 -->
+    <use href="#shell" fill="url(#shellG)"/>
+    <g clip-path="url(#c-shell)">
+      <path d="M20 170 C70 250 200 252 244 150 V260 H20Z" fill="#4c5468" opacity=".42"/>
+      <path d="M136 62 C182 62 210 96 208 136 C206 176 176 204 138 204 C102 204 76 178 76 146 C76 118 98 98 126 98 C150 98 168 116 168 138 C168 158 154 172 136 172 C122 172 112 162 112 148 C112 138 120 130 132 130" fill="none" stroke="#5a6278" stroke-width="9"/>
+      <path d="M136 62 C182 62 210 96 208 136 C206 176 176 204 138 204 C102 204 76 178 76 146 C76 118 98 98 126 98 C150 98 168 116 168 138 C168 158 154 172 136 172 C122 172 112 162 112 148 C112 138 120 130 132 130" fill="none" stroke="#7c8598" stroke-width="3" transform="translate(-3 -3)" opacity=".7"/>
+      <path d="M60 92 C74 66 98 50 124 46" fill="none" stroke="#fff" stroke-width="8" opacity=".35"/>
+      <path d="M196 60 l10 16 l-8 10 l12 14 M48 150 l14 8 l-4 14" fill="none" stroke="#4c5468" stroke-width="2.6"/>
+      <g fill="#86c45a" stroke="#3f6a2a" stroke-width="2.4"><path d="M150 232 C160 218 186 214 204 222 C200 234 176 244 150 240Z"/><circle cx="92" cy="216" r="7"/></g>
+    </g>
+    <use href="#shell" fill="none" stroke="#343a4c" stroke-width="5"/>
+  </g>
+
+  <g id="L-head">
+    <!-- 눈자루 -->
+    <path d="M238 182 L226 134 M270 176 L284 130" fill="none" stroke="#7a5a2c" stroke-width="19"/>
+    <path d="M238 182 L226 134 M270 176 L284 130" fill="none" stroke="#f6dea4" stroke-width="10"/>
+    <!-- 머리 -->
+    <use href="#headFill" fill="url(#skinG)"/>
+    <g clip-path="url(#c-head)">
+      <path d="M200 240 C240 262 290 252 310 214 V270 H200Z" fill="#cfa868" opacity=".5"/>
+      <path d="M224 204 C226 190 236 180 248 178" fill="none" stroke="#fff6d8" stroke-width="5" opacity=".75"/>
+    </g>
+    <path d="M213 258 C204 222 208 186 232 172 C258 158 292 172 300 204 C306 230 297 252 280 262" fill="none" stroke="#7a5a2c" stroke-width="5"/>
+    <g id="eyes-open">
+      <circle cx="224" cy="120" r="18" fill="#fff" stroke="#7a5a2c" stroke-width="4.6"/>
+      <circle cx="286" cy="116" r="18" fill="#fff" stroke="#7a5a2c" stroke-width="4.6"/>
+      <ellipse cx="229" cy="122" rx="8" ry="10" fill="#2b2238"/><ellipse cx="291" cy="118" rx="8" ry="10" fill="#2b2238"/>
+      <circle cx="226" cy="117" r="3.2" fill="#fff"/><circle cx="288" cy="113" r="3.2" fill="#fff"/>
+      <path d="M204 110 C216 100 232 100 244 112 C232 108 216 108 204 110Z M266 106 C278 96 296 96 306 108 C294 104 278 104 266 106Z" fill="#7a5a2c" stroke="#7a5a2c" stroke-width="3"/>
+    </g>
+    <g id="eyes-closed" display="none">
+      <circle cx="224" cy="120" r="18" fill="#f6dea4" stroke="#7a5a2c" stroke-width="4.6"/>
+      <circle cx="286" cy="116" r="18" fill="#f6dea4" stroke="#7a5a2c" stroke-width="4.6"/>
+      <path d="M211 122 Q224 132 237 122 M273 118 Q286 128 299 118" fill="none" stroke="#7a5a2c" stroke-width="4.6"/>
+    </g>
+    <ellipse cx="282" cy="218" rx="10" ry="6" fill="#ff8fa3" opacity=".55"/>
+    <path d="M258 232 Q270 224 284 232" fill="none" stroke="#8a4a2c" stroke-width="3.6"/>
+    <path d="M262 231 l3 6 l3 -6" fill="#fff" stroke="#8a4a2c" stroke-width="1.6"/>
+  </g>
+</svg>

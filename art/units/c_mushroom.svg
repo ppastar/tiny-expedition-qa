@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 288 352" data-ppu="176" data-neck="144 244" stroke-linejoin="round" stroke-linecap="round">
+  <!-- 버섯 약사: 흰 긴 머리, 빨간 버섯 모자, 크림색 옷, 분홍 물약 -->
+  <defs>
+    <radialGradient id="capG" cx="34%" cy="22%" r="85%"><stop offset="0" stop-color="#ff9480"/><stop offset=".5" stop-color="#ea584d"/><stop offset="1" stop-color="#c2363b"/></radialGradient>
+    <linearGradient id="irisG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6e1826"/><stop offset=".55" stop-color="#d64848"/><stop offset="1" stop-color="#ffa07c"/></linearGradient>
+    <linearGradient id="potG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb3cb"/><stop offset="1" stop-color="#f0608f"/></linearGradient>
+    <path id="cap" d="M40 132 C34 74 86 30 146 30 C206 30 254 76 248 132 C246 146 214 151 144 151 C74 151 42 146 40 132 Z"/>
+    <path id="robe" d="M118 240 C108 262 100 288 96 306 C112 317 176 317 192 306 C188 288 180 262 170 240 C160 234 128 234 118 240 Z"/>
+    <path id="face" d="M82 182 C82 142 110 124 144 124 C178 124 206 142 206 182 C206 216 180 242 144 242 C108 242 82 216 82 182Z"/>
+    <path id="bang" d="M80 188 C74 152 96 130 144 128 C192 130 214 152 208 188 C204 178 198 170 190 164 C190 176 184 184 174 188 C176 176 172 166 164 158 C158 172 146 180 130 184 C134 174 134 166 132 158 C122 170 108 176 94 176 C90 182 86 186 80 188 Z"/>
+    <path id="backhair" d="M76 176 C62 230 60 276 74 314 C82 301 88 299 94 311 C100 299 108 299 114 309 L174 309 C180 299 188 299 194 311 C200 299 206 301 214 314 C228 276 226 230 212 176 Z"/>
+    <path id="lock" d="M85 170 C72 202 76 234 91 256 C95 234 98 208 98 176 Z"/>
+    <path id="boot" d="M122 316 h20 v13 a7 7 0 0 1 -7 7 h-13 a7 7 0 0 1 -7 -7 v-1 a9 9 0 0 1 7 -12z"/>
+    <clipPath id="c-cap"><use href="#cap"/></clipPath>
+    <clipPath id="c-robe"><use href="#robe"/></clipPath>
+    <clipPath id="c-face"><use href="#face"/></clipPath>
+    <clipPath id="c-bang"><use href="#bang"/></clipPath>
+    <clipPath id="c-back"><use href="#backhair"/></clipPath>
+    <clipPath id="c-flask"><circle cx="216" cy="258" r="15"/></clipPath>
+    <g id="eye">
+      <ellipse rx="12.5" ry="16" fill="#fff"/>
+      <ellipse cy="1" rx="11" ry="14.5" fill="url(#irisG)"/>
+      <ellipse cy="0" rx="5" ry="7.5" fill="#480d1a"/>
+      <ellipse cy="9.5" rx="6" ry="3.2" fill="#ffd0b0" opacity=".75"/>
+      <circle cx="-4.2" cy="-7" r="4.4" fill="#fff"/><circle cx="4.6" cy="6" r="2" fill="#fff"/>
+    </g>
+    <g id="lash">
+      <path d="M-17 -5 C-13 -21 11 -21 15 -8 C8 -15 -8 -15 -13 -8 C-14 -5 -16 -3 -19 -1 Z" fill="#3a2430"/>
+      <path d="M-8 15.5 q8 3 16 0" fill="none" stroke="#a8644e" stroke-width="1.6"/>
+    </g>
+    <g id="lid">
+      <path d="M-14 0 Q0 11 14 0" fill="none" stroke="#3a2430" stroke-width="5"/>
+      <path d="M-14 0 l-5 -3 M-9 5 l-3 4" fill="none" stroke="#3a2430" stroke-width="2.4"/>
+    </g>
+  </defs>
+
+  <g id="L-back">
+    <g transform="translate(144 244) scale(1.18) translate(-144 -244)">
+      <use href="#backhair" fill="#ece2d6" stroke="#8a7667" stroke-width="4.6"/>
+      <g clip-path="url(#c-back)">
+        <path d="M150 170 C176 220 178 280 166 320 L230 320 L226 170Z" fill="#d6c8b9"/>
+        <path d="M92 230 C88 262 90 286 96 304 M196 228 C200 258 198 284 192 304 M112 250 C110 276 112 292 116 304" fill="none" stroke="#bfb0a1" stroke-width="2"/>
+      </g>
+    </g>
+  </g>
+
+  <g id="L-body">
+    <!-- 다리·신발 -->
+    <rect x="127" y="300" width="12" height="20" fill="#ffe3cf" stroke="#a8644e" stroke-width="3.2"/>
+    <rect x="149" y="300" width="12" height="20" fill="#ffe3cf" stroke="#a8644e" stroke-width="3.2"/>
+    <use href="#boot" fill="#cf4a42" stroke="#6e2428" stroke-width="4"/>
+    <use href="#boot" fill="#cf4a42" stroke="#6e2428" stroke-width="4" transform="translate(288 0) scale(-1 1)"/>
+    <path d="M119 322 h20 M149 322 h20" stroke="#ffe9dc" stroke-width="3.2" fill="none"/>
+    <!-- 옷 -->
+    <use href="#robe" fill="#fff8ef"/>
+    <g clip-path="url(#c-robe)">
+      <path d="M152 232 C168 262 172 292 164 320 L200 320 L200 232Z" fill="#ecd9c6"/>
+      <ellipse cx="144" cy="240" rx="34" ry="13" fill="#e3cbb6"/>
+      <path d="M94 300 C112 311 176 311 194 300" fill="none" stroke="#e0584f" stroke-width="6"/>
+      <path d="M108 262 C114 280 112 296 108 310 M178 266 C174 282 176 296 180 310" fill="none" stroke="#dcc6b2" stroke-width="2"/>
+    </g>
+    <use href="#robe" fill="none" stroke="#86644f" stroke-width="4.6"/>
+    <path d="M107 277 C124 284 164 284 181 277" fill="none" stroke="#a8413c" stroke-width="7"/>
+    <rect x="137" y="273" width="14" height="12" rx="3" fill="#ffd166" stroke="#8a5a1e" stroke-width="2"/>
+    <circle cx="144" cy="261" r="3.4" fill="#e0584f" stroke="#7a2530" stroke-width="1.5"/>
+    <!-- 왼팔 -->
+    <path d="M122 242 C104 248 94 268 94 286 C100 291 108 291 114 286 C114 272 120 262 130 256 Z" fill="#fff8ef" stroke="#86644f" stroke-width="4"/>
+    <path d="M95 281 C101 285 108 285 114 281" fill="none" stroke="#e0584f" stroke-width="5"/>
+    <circle cx="104" cy="294" r="8.5" fill="#ffe3cf" stroke="#a8644e" stroke-width="3.2"/>
+    <!-- 물약 -->
+    <rect x="210" y="231" width="12" height="16" rx="2" fill="#dff2fa" stroke="#4f6f86" stroke-width="3.2"/>
+    <rect x="208" y="224" width="16" height="9" rx="3" fill="#b07a48" stroke="#5e3d1e" stroke-width="3.2"/>
+    <circle cx="216" cy="258" r="15" fill="#e8f7fd"/>
+    <g clip-path="url(#c-flask)">
+      <path d="M198 256 q5 -4 9 0 t9 0 t9 0 t9 0 V276 H198Z" fill="url(#potG)"/>
+      <circle cx="212" cy="264" r="2" fill="#fff" opacity=".8"/><circle cx="221" cy="267" r="1.4" fill="#fff" opacity=".8"/>
+    </g>
+    <circle cx="216" cy="258" r="15" fill="none" stroke="#4f6f86" stroke-width="4"/>
+    <path d="M206 252 q2 -6 8 -8" fill="none" stroke="#fff" stroke-width="4"/>
+    <path d="M242 226 l2.5 6 l6 2.5 l-6 2.5 l-2.5 6 l-2.5 -6 l-6 -2.5 l6 -2.5z" fill="#fff6c2" stroke="#e0a83a" stroke-width="1.2"/>
+    <!-- 오른팔 -->
+    <path d="M166 242 C184 246 198 256 207 270 C203 277 197 281 190 281 C184 271 174 263 160 258 Z" fill="#fff8ef" stroke="#86644f" stroke-width="4"/>
+    <path d="M193 280 C198 277 203 273 205 268" fill="none" stroke="#e0584f" stroke-width="5"/>
+    <circle cx="203" cy="279" r="8.5" fill="#ffe3cf" stroke="#a8644e" stroke-width="3.2"/>
+    <!-- 리본 -->
+    <path d="M144 248 l-17 -9 q-4 9 0 18z M144 248 l17 -9 q4 9 0 18z" fill="#e0584f" stroke="#7a2530" stroke-width="3.2"/>
+    <circle cx="144" cy="248" r="4.5" fill="#f27a6c" stroke="#7a2530" stroke-width="2"/>
+  </g>
+
+  <g id="L-head">
+    <g transform="translate(144 244) scale(1.18) translate(-144 -244)">
+      <use href="#face" fill="#ffe6d4"/>
+      <g clip-path="url(#c-face)">
+        <use href="#bang" fill="#f2c3ab" transform="translate(0 8)"/>
+        <path d="M82 214 C104 246 184 246 206 214 V250 H82Z" fill="#f9d2bd" opacity=".7"/>
+      </g>
+      <use href="#face" fill="none" stroke="#a8644e" stroke-width="4"/>
+      <g id="eyes-open">
+        <use href="#eye" transform="translate(119 198)"/>
+        <use href="#eye" transform="translate(169 198)"/>
+        <use href="#lash" transform="translate(119 198)"/>
+        <use href="#lash" transform="translate(169 198) scale(-1 1)"/>
+      </g>
+      <g id="eyes-closed" display="none">
+        <use href="#lid" transform="translate(119 202)"/>
+        <use href="#lid" transform="translate(169 202) scale(-1 1)"/>
+      </g>
+      <!-- 볼·입 -->
+      <ellipse cx="99" cy="216" rx="11" ry="6" fill="#ff8fa3" opacity=".5"/>
+      <ellipse cx="189" cy="216" rx="11" ry="6" fill="#ff8fa3" opacity=".5"/>
+      <path d="M93 218 l3 -5 M98 219 l3 -5 M103 219 l3 -5 M183 219 l3 -5 M188 219 l3 -5 M193 218 l3 -5" stroke="#e86a84" stroke-width="1.4" fill="none"/>
+      <path d="M136 218 Q144 231 152 218 Z" fill="#d9546e" stroke="#8a2f45" stroke-width="1.8"/>
+      <path d="M140 224 Q144 221 148 224 Q144 229 140 224Z" fill="#ff9aa8"/>
+      <!-- 옆머리·앞머리 -->
+      <use href="#lock" fill="#fbf5ec" stroke="#8a7667" stroke-width="4"/>
+      <use href="#lock" fill="#f1e7db" stroke="#8a7667" stroke-width="4" transform="translate(288 0) scale(-1 1)"/>
+      <use href="#bang" fill="#fbf5ec"/>
+      <g clip-path="url(#c-bang)">
+        <path d="M70 120 H218 V160 C190 170 98 170 70 160Z" fill="#d9ccbe"/>
+        <path d="M170 150 C190 160 206 174 210 190 L220 150Z" fill="#e6dbce"/>
+      </g>
+      <use href="#bang" fill="none" stroke="#8a7667" stroke-width="4"/>
+      <path d="M112 156 C110 164 104 171 98 174 M150 154 C150 164 146 173 139 178 M183 158 C185 168 183 176 179 183" fill="none" stroke="#b5a595" stroke-width="1.8"/>
+      <!-- 버섯 모자 -->
+      <g transform="translate(144 150) rotate(-5) scale(.9) translate(-144 -150)">
+        <ellipse cx="144" cy="146" rx="101" ry="13" fill="#ffeedd" stroke="#86644f" stroke-width="4"/>
+        <path d="M70 148 l-4 6 M96 152 l-2 6 M124 154 l-1 6 M152 154 l1 6 M180 153 l2 6 M208 150 l4 6" stroke="#d9bfa8" stroke-width="2" fill="none"/>
+        <use href="#cap" fill="url(#capG)"/>
+        <g clip-path="url(#c-cap)">
+          <path d="M30 116 C84 142 206 142 258 116 V170 H30Z" fill="#a82a36" opacity=".45"/>
+          <g fill="#f1d6cc"><ellipse cx="94" cy="95" rx="17" ry="13" transform="rotate(-22 94 95)"/><ellipse cx="152" cy="65" rx="19" ry="12"/><ellipse cx="208" cy="103" rx="14" ry="11" transform="rotate(24 208 103)"/><ellipse cx="129" cy="124" rx="10" ry="6"/><ellipse cx="183" cy="130" rx="8" ry="5"/><ellipse cx="52" cy="128" rx="11" ry="8"/></g>
+          <g fill="#fffaf5"><ellipse cx="93" cy="92" rx="17" ry="13" transform="rotate(-22 93 92)"/><ellipse cx="151" cy="62" rx="19" ry="12"/><ellipse cx="207" cy="100" rx="14" ry="11" transform="rotate(24 207 100)"/><ellipse cx="128" cy="122" rx="10" ry="6"/><ellipse cx="182" cy="128" rx="8" ry="5"/><ellipse cx="51" cy="126" rx="11" ry="8"/></g>
+          <path d="M64 92 C76 64 100 46 128 40" fill="none" stroke="#fff" stroke-width="7" opacity=".38"/>
+        </g>
+        <use href="#cap" fill="none" stroke="#7a2530" stroke-width="5"/>
+      </g>
+    </g>
+  </g>
+</svg>

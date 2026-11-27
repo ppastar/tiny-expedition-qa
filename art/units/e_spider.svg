@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 250" data-ppu="165" stroke-linejoin="round" stroke-linecap="round">
+  <!-- 거미: 청록 머리, 보라 배에 연두 점, 마디진 다리 여덟 개 -->
+  <defs>
+    <radialGradient id="headG" cx="36%" cy="26%" r="85%"><stop offset="0" stop-color="#6fc4b6"/><stop offset=".6" stop-color="#3f8f86"/><stop offset="1" stop-color="#2c6a68"/></radialGradient>
+    <radialGradient id="bellyG" cx="38%" cy="24%" r="85%"><stop offset="0" stop-color="#8a68c4"/><stop offset=".6" stop-color="#5a3f8f"/><stop offset="1" stop-color="#40296e"/></radialGradient>
+    <linearGradient id="eyeG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b81f3c"/><stop offset=".6" stop-color="#ff5a6e"/><stop offset="1" stop-color="#ffb09a"/></linearGradient>
+    <path id="abdomen" d="M160 28 C204 28 232 58 230 96 C228 134 198 156 160 156 C122 156 92 134 90 96 C88 58 116 28 160 28 Z"/>
+    <path id="headShape" d="M160 112 C194 112 216 136 216 168 C216 178 213 187 208 194 L217 202 L203 204 C192 216 177 222 160 222 C143 222 128 216 117 204 L103 202 L112 194 C107 187 104 178 104 168 C104 136 126 112 160 112 Z"/>
+    <clipPath id="c-abdomen"><use href="#abdomen"/></clipPath>
+    <clipPath id="c-head"><use href="#headShape"/></clipPath>
+    <g id="legs">
+      <g fill="none" stroke="#17323a" stroke-width="16">
+        <path d="M196 134 L238 78 L272 138"/>
+        <path d="M204 156 L258 108 L294 206"/>
+        <path d="M208 172 L266 152 L308 224"/>
+        <path d="M200 190 L242 182 L266 230"/>
+      </g>
+      <g fill="none" stroke="#2f5f66" stroke-width="8.5">
+        <path d="M196 134 L238 78 L272 138"/>
+        <path d="M204 156 L258 108 L294 206"/>
+        <path d="M208 172 L266 152 L308 224"/>
+        <path d="M200 190 L242 182 L266 230"/>
+      </g>
+      <g fill="none" stroke="#5c979c" stroke-width="2.4" opacity=".8">
+        <path d="M214 106 L236 78 M222 136 L256 106 M226 162 L264 149 M214 185 L240 179"/>
+      </g>
+      <g fill="#b6f25a" stroke="#17323a" stroke-width="2.4">
+        <circle cx="238" cy="78" r="5"/><circle cx="258" cy="108" r="5"/><circle cx="266" cy="152" r="5"/><circle cx="242" cy="182" r="4.4"/>
+      </g>
+    </g>
+    <g id="eye">
+      <ellipse rx="13" ry="16" fill="#1c1630"/>
+      <ellipse cy="1" rx="10.5" ry="13.5" fill="url(#eyeG)"/>
+      <ellipse cy="1" rx="4.6" ry="8" fill="#4a0a1c"/>
+      <circle cx="-4" cy="-6" r="3.8" fill="#fff"/><circle cx="4.2" cy="7" r="1.9" fill="#fff"/>
+    </g>
+  </defs>
+
+  <g id="L-body">
+    <use href="#legs"/><use href="#legs" transform="translate(320 0) scale(-1 1)"/>
+    <!-- 배 -->
+    <use href="#abdomen" fill="url(#bellyG)"/>
+    <g clip-path="url(#c-abdomen)">
+      <path d="M86 104 C118 150 204 150 236 92 V170 H86Z" fill="#2c1b52" opacity=".4"/>
+      <g fill="#8fcf3a"><ellipse cx="131" cy="71" rx="14" ry="12" transform="rotate(-18 131 71)"/><ellipse cx="185" cy="58" rx="11" ry="9"/><ellipse cx="200" cy="96" rx="9" ry="8"/><ellipse cx="157" cy="96" rx="6" ry="5"/></g>
+      <g fill="#c4f76a"><ellipse cx="130" cy="68" rx="14" ry="12" transform="rotate(-18 130 68)"/><ellipse cx="184" cy="55" rx="11" ry="9"/><ellipse cx="199" cy="93" rx="9" ry="8"/><ellipse cx="156" cy="94" rx="6" ry="5"/></g>
+      <path d="M108 70 C116 50 134 38 154 36" fill="none" stroke="#fff" stroke-width="6" opacity=".28"/>
+    </g>
+    <use href="#abdomen" fill="none" stroke="#231640" stroke-width="5"/>
+    <!-- 머리 -->
+    <use href="#headShape" fill="url(#headG)"/>
+    <g clip-path="url(#c-head)">
+      <path d="M100 186 C128 226 196 226 222 176 V230 H100Z" fill="#1f5458" opacity=".42"/>
+      <path d="M120 146 C126 130 140 121 154 119" fill="none" stroke="#fff" stroke-width="5.5" opacity=".3"/>
+    </g>
+    <use href="#headShape" fill="none" stroke="#17323a" stroke-width="5"/>
+    <!-- 곁눈 -->
+    <circle cx="116" cy="140" r="6.5" fill="#1c1630"/><circle cx="204" cy="140" r="6.5" fill="#1c1630"/>
+    <circle cx="114.5" cy="138.5" r="2" fill="#fff"/><circle cx="202.500" cy="138.5" r="2" fill="#fff"/>
+    <g id="eyes-open">
+      <use href="#eye" transform="translate(139 164)"/><use href="#eye" transform="translate(181 164)"/>
+      <path d="M122 149 L152 156 M198 149 L168 156" stroke="#17323a" stroke-width="6" fill="none"/>
+    </g>
+    <g id="eyes-closed" display="none">
+      <path d="M127 162 Q139 172 151 164 M193 162 Q181 172 169 164" stroke="#17323a" stroke-width="5.4" fill="none"/>
+    </g>
+    <ellipse cx="119" cy="186" rx="9" ry="5" fill="#ff8fa3" opacity=".5"/><ellipse cx="201" cy="186" rx="9" ry="5" fill="#ff8fa3" opacity=".5"/>
+    <!-- 입·송곳니 -->
+    <path d="M148 192 Q160 200 172 192" fill="none" stroke="#17323a" stroke-width="3.2"/>
+    <path d="M148 193 l4.500 13 l5 -11z M172 193 l-4.500 13 l-5 -11z" fill="#c4f76a" stroke="#17323a" stroke-width="2.2"/>
+  </g>
+</svg>

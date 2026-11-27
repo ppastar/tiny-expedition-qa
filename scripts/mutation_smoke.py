@@ -94,6 +94,11 @@ MUTATIONS = [
      "foreach (var a in _allies) { a.StunLeft = 0; a.PoisonStacks = 0; a.Guarding = false; }", ""),
     ("[턴제 화면] 다음 웨이브 적을 세우지 않음 (이전 웨이브 적이 그대로 보임)", "Battle/TurnBattleDisplay.cs",
      "_enemies = Spawn(WaveIndex);", ""),
+    # --- 그림 리소스 ---
+    ("[그림] 거미 그림 키 오타 (독거미가 기본 그림으로 보임)", "Data/ArtCatalog.cs",
+     '"거미", "e_spider"', '"거미", "e_spdier"'),
+    ("[그림] 적 종류를 이름과 무관하게 첫 번째로 고름 (모든 적이 박쥐로 보임)", "Data/ArtCatalog.cs",
+     "if (enemyName.Contains(kind.Key)) return kind.Value;", "return kind.Value;"),
     # --- qa-tool (BUG-003) ---
     ("[qa-tool] 시드를 long으로 읽음 (long 최대값보다 큰 시드 거부, 음수는 큰 시드로 바뀜)", "dotnet/QaTool/Common.cs",
      "return ulong.TryParse(v.Replace(\"_\", \"\"), out var n) ? n :",

@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" data-ppu="175" data-flap="150 168" stroke-linejoin="round" stroke-linecap="round">
+  <!-- 요정: 호박색 불씨 요정. 뾰족한 꽃봉오리 머리에 잎사귀, 투명한 날개, 작은 몸 -->
+  <defs>
+    <radialGradient id="faceG" cx="36%" cy="30%" r="85%"><stop offset="0" stop-color="#ffe08a"/><stop offset=".6" stop-color="#ffc24a"/><stop offset="1" stop-color="#ee9a2a"/></radialGradient>
+    <linearGradient id="wingG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4fdff" stop-opacity=".95"/><stop offset="1" stop-color="#a8dcf4" stop-opacity=".8"/></linearGradient>
+    <linearGradient id="eyeG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a3a0a"/><stop offset=".6" stop-color="#c0661a"/><stop offset="1" stop-color="#ffb86a"/></linearGradient>
+    <path id="headShape" d="M158 34 C150 58 168 76 190 96 C212 116 220 142 216 168 C212 204 184 226 150 226 C116 226 88 204 84 168 C80 136 94 110 118 94 C140 80 160 62 158 34 Z"/>
+    <clipPath id="c-head"><use href="#headShape"/></clipPath>
+    <g id="wingPair">
+      <path d="M200 150 C222 108 262 92 290 104 C292 138 262 164 204 168 Z" fill="url(#wingG)" stroke="#4f8fb0" stroke-width="4.6"/>
+      <path d="M204 176 C232 176 262 190 268 214 C246 226 216 212 200 188 Z" fill="url(#wingG)" stroke="#4f8fb0" stroke-width="4.6"/>
+      <path d="M206 160 C232 140 258 122 284 110 M210 164 C236 156 258 150 276 138 M206 182 C226 190 246 200 262 212" fill="none" stroke="#7fbcdc" stroke-width="2.2"/>
+      <path d="M232 118 C246 108 262 104 276 106" fill="none" stroke="#fff" stroke-width="4" opacity=".8"/>
+    </g>
+    <g id="eye">
+      <ellipse rx="12.5" ry="16" fill="#3a2010"/>
+      <ellipse cy="1" rx="10.5" ry="13.5" fill="url(#eyeG)"/>
+      <ellipse cy="0" rx="4.6" ry="7" fill="#3a1a04"/>
+      <circle cx="-4" cy="-6.500" r="4" fill="#fff"/><circle cx="4.200" cy="6.500" r="2" fill="#fff"/>
+    </g>
+  </defs>
+
+  <g id="L-wings">
+    <use href="#wingPair"/><use href="#wingPair" transform="translate(300 0) scale(-1 1)"/>
+  </g>
+
+  <g id="L-body">
+    <!-- 작은 몸·팔다리 -->
+    <path d="M134 262 C130 272 132 282 138 286 M166 262 C170 272 168 282 162 286" fill="none" stroke="#8a4a12" stroke-width="11"/>
+    <path d="M134 262 C130 272 132 282 138 286 M166 262 C170 272 168 282 162 286" fill="none" stroke="#ffcf6a" stroke-width="5.5"/>
+    <path d="M124 222 C116 250 130 270 150 272 C170 270 184 250 176 222 Z" fill="#86c45a" stroke="#3f6a2a" stroke-width="4.6"/>
+    <path d="M150 226 C162 240 166 256 160 270 C172 262 180 244 176 226Z" fill="#5fa040" opacity=".7"/>
+    <path d="M126 246 l12 8 l12 -8 l12 8 l12 -8" fill="none" stroke="#3f6a2a" stroke-width="2.4"/>
+    <path d="M124 232 C108 236 100 246 100 256 M176 232 C192 232 202 224 206 212" fill="none" stroke="#8a4a12" stroke-width="11"/>
+    <path d="M124 232 C108 236 100 246 100 256 M176 232 C192 232 202 224 206 212" fill="none" stroke="#ffcf6a" stroke-width="5.5"/>
+    <!-- 반짝이 -->
+    <path d="M214 196 l2.500 6 l6 2.500 l-6 2.500 l-2.500 6 l-2.500 -6 l-6 -2.500 l6 -2.500z" fill="#fff6c2" stroke="#e0a83a" stroke-width="1.4"/>
+    <!-- 머리 -->
+    <use href="#headShape" fill="url(#faceG)"/>
+    <g clip-path="url(#c-head)">
+      <path d="M78 176 C104 232 196 232 222 164 V236 H78Z" fill="#d07a1a" opacity=".38"/>
+      <path d="M158 34 C152 60 170 78 192 98 C176 92 160 84 150 70 C146 58 150 44 158 34Z" fill="#ff9a3a" opacity=".7"/>
+      <path d="M104 150 C106 128 120 112 138 104" fill="none" stroke="#fff" stroke-width="7" opacity=".4"/>
+      <path d="M132 100 C140 108 150 108 160 100 M160 100 C170 108 180 110 190 104" fill="none" stroke="#ee9a2a" stroke-width="2.6"/>
+    </g>
+    <use href="#headShape" fill="none" stroke="#8a4a12" stroke-width="5"/>
+    <!-- 머리 꼭대기 잎사귀 -->
+    <path d="M160 40 C170 22 190 14 208 18 C204 38 186 50 164 48 Z" fill="#8fd16a" stroke="#3f6a2a" stroke-width="4"/>
+    <path d="M166 44 C178 34 190 26 202 22" fill="none" stroke="#3f6a2a" stroke-width="2.2"/>
+    <g id="eyes-open">
+      <use href="#eye" transform="translate(126 164)"/><use href="#eye" transform="translate(174 164)"/>
+      <path d="M110 146 C118 138 130 136 140 142 M190 146 C182 138 170 136 160 142" fill="none" stroke="#8a4a12" stroke-width="4.6"/>
+    </g>
+    <g id="eyes-closed" display="none">
+      <path d="M114 164 Q126 174 138 164 M186 164 Q174 174 162 164" fill="none" stroke="#3a2010" stroke-width="5"/>
+    </g>
+    <ellipse cx="106" cy="186" rx="11" ry="6.500" fill="#ff7f8f" opacity=".55"/><ellipse cx="194" cy="186" rx="11" ry="6.500" fill="#ff7f8f" opacity=".55"/>
+    <!-- 장난스러운 입 -->
+    <path d="M136 192 Q150 208 166 190 Q150 198 136 192Z" fill="#a8402a" stroke="#6a2414" stroke-width="2.6"/>
+    <path d="M157 195 l3 7 l4 -8z" fill="#fff" stroke="#6a2414" stroke-width="1.4"/>
+  </g>
+</svg>

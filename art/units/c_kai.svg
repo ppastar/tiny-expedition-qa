@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 288 352" data-ppu="176" data-neck="144 244" stroke-linejoin="round" stroke-linecap="round">
+  <!-- 회오리 검사 카이: 청록 삐죽 머리, 주황 머리띠, 흰 옷, 날리는 주황 목도리, 검 -->
+  <defs>
+    <linearGradient id="irisG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0c4f55"/><stop offset=".55" stop-color="#1f9a94"/><stop offset="1" stop-color="#9ff0d8"/></linearGradient>
+    <linearGradient id="hairG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6fe0d6"/><stop offset="1" stop-color="#3fb4ae"/></linearGradient>
+    <linearGradient id="bladeG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#bcd6e0"/></linearGradient>
+    <path id="face" d="M82 182 C82 142 110 124 144 124 C178 124 206 142 206 182 C206 216 180 242 144 242 C108 242 82 216 82 182Z"/>
+    <path id="spikes" d="M82 200 L58 180 L78 170 L54 142 L84 140 L70 106 L104 118 L106 84 L134 108 L150 76 L164 110 L194 88 L190 122 L224 112 L206 142 L234 148 L210 170 L230 184 L206 200 Z"/>
+    <path id="bang" d="M80 192 C72 150 98 122 144 120 C190 122 216 150 208 192 L198 172 L188 196 L176 168 L162 198 L148 166 L134 196 L122 168 L108 194 L98 172 Z"/>
+    <path id="tunic" d="M118 242 C110 260 104 282 102 298 C120 309 168 309 186 298 C184 282 178 260 170 242 C160 236 128 236 118 242Z"/>
+    <path id="boot" d="M122 314 h20 v15 a7 7 0 0 1 -7 7 h-13 a7 7 0 0 1 -7 -7 v-1 a9 9 0 0 1 7 -14z"/>
+    <clipPath id="c-face"><use href="#face"/></clipPath>
+    <clipPath id="c-bang"><use href="#bang"/></clipPath>
+    <clipPath id="c-spikes"><use href="#spikes"/></clipPath>
+    <clipPath id="c-tunic"><use href="#tunic"/></clipPath>
+    <g id="eye">
+      <path d="M-13 2 C-13 -10 -6 -15 1 -15 C9 -15 13 -8 13 2 C13 11 7 15 0 15 C-8 15 -13 10 -13 2Z" fill="#fff"/>
+      <ellipse cx=".5" cy="1" rx="10.5" ry="13" fill="url(#irisG)"/>
+      <ellipse cx=".5" cy="0" rx="4.6" ry="7" fill="#062e33"/>
+      <ellipse cx=".5" cy="9" rx="5.5" ry="3" fill="#c8fff0" opacity=".75"/>
+      <circle cx="-4" cy="-6.5" r="4.2" fill="#fff"/><circle cx="5" cy="5.5" r="1.9" fill="#fff"/>
+    </g>
+    <g id="lash">
+      <!-- 눈꼬리가 올라간 날카로운 눈매 -->
+      <path d="M-15 -6 C-9 -17 8 -19 17 -13 L21 -19 L19 -8 C12 -13 -6 -13 -12 -6 Z" fill="#23343a"/>
+      <path d="M-14 -22 L10 -27" fill="none" stroke="#1c6b68" stroke-width="4.6"/>
+      <path d="M-6 15 q7 2.5 13 0" fill="none" stroke="#a06a4c" stroke-width="1.6"/>
+    </g>
+    <g id="lid">
+      <path d="M-13 3 Q0 -7 14 0" fill="none" stroke="#23343a" stroke-width="5"/>
+      <path d="M-14 -20 L10 -25" fill="none" stroke="#1c6b68" stroke-width="4.6"/>
+    </g>
+  </defs>
+
+  <g id="L-back">
+    <g transform="translate(144 244) scale(1.2) translate(-144 -244)">
+      <!-- 머리띠 끈 -->
+      <path d="M204 162 C222 150 238 150 254 140 C252 152 254 160 262 166 C244 170 226 170 206 172Z" fill="#ff7a66" stroke="#a83a2c" stroke-width="4"/>
+      <path d="M204 168 C220 174 234 184 244 198 C234 196 226 198 220 204 C216 190 210 180 200 176Z" fill="#e8604e" stroke="#a83a2c" stroke-width="4"/>
+      <use href="#spikes" fill="#36a8a2" stroke="#1c6b68" stroke-width="4.6"/>
+      <g clip-path="url(#c-spikes)">
+        <path d="M150 70 L164 110 L194 88 L190 122 L224 112 L206 142 L234 148 L210 170 L230 184 L206 200 L150 200Z" fill="#2c8f8a"/>
+      </g>
+    </g>
+  </g>
+
+  <g id="L-body">
+    <!-- 날리는 목도리 -->
+    <path d="M126 242 C100 236 76 248 48 236 C58 250 56 260 44 268 C72 274 100 268 128 258Z" fill="#ff7a66" stroke="#a83a2c" stroke-width="4.6"/>
+    <path d="M124 252 C104 262 86 278 60 280 C70 288 72 296 66 306 C92 300 112 284 130 264Z" fill="#e8604e" stroke="#a83a2c" stroke-width="4.6"/>
+    <path d="M60 246 C76 252 96 250 112 246 M78 284 C92 280 104 272 114 264" fill="none" stroke="#ffb09e" stroke-width="2.4"/>
+    <!-- 다리·신발 -->
+    <rect x="126" y="296" width="14" height="22" fill="#2f6f7a" stroke="#173e46" stroke-width="3.2"/>
+    <rect x="148" y="296" width="14" height="22" fill="#2f6f7a" stroke="#173e46" stroke-width="3.2"/>
+    <use href="#boot" fill="#245560" stroke="#123038" stroke-width="4"/>
+    <use href="#boot" fill="#245560" stroke="#123038" stroke-width="4" transform="translate(288 0) scale(-1 1)"/>
+    <path d="M119 320 h20 M149 320 h20" stroke="#ff7a66" stroke-width="3" fill="none"/>
+    <!-- 검 -->
+    <path d="M206.3 265.9 L253.3 179.9 L269 164 L264.7 186.1 L217.7 272.1Z" fill="url(#bladeG)" stroke="#3f5a66" stroke-width="3.2"/>
+    <path d="M214 264 L260 180" fill="none" stroke="#9fc0cc" stroke-width="2"/>
+    <path d="M198 266 L222 279" fill="none" stroke="#173e46" stroke-width="11"/>
+    <path d="M198 266 L222 279" fill="none" stroke="#3fb4ae" stroke-width="6"/>
+    <path d="M209 274 L199 294" fill="none" stroke="#5e3d1e" stroke-width="8"/>
+    <circle cx="198" cy="297" r="5" fill="#ffd166" stroke="#8a5a1e" stroke-width="2.4"/>
+    <!-- 바람결 -->
+    <path d="M232 240 C250 234 262 218 258 202 M274 224 C280 212 280 202 276 194 M226 214 C232 212 236 206 236 200" fill="none" stroke="#9ff0ea" stroke-width="3.2" opacity=".9"/>
+    <!-- 옷 -->
+    <use href="#tunic" fill="#f6f9ff"/>
+    <g clip-path="url(#c-tunic)">
+      <path d="M152 232 C168 258 172 284 166 312 L192 312 L192 232Z" fill="#dbe4f2"/>
+      <path d="M102 294 C120 305 168 305 186 294" fill="none" stroke="#3fb4ae" stroke-width="6"/>
+      <path d="M132 240 L144 268 L156 240" fill="none" stroke="#3fb4ae" stroke-width="4"/>
+      <path d="M112 262 C116 276 114 288 110 300" fill="none" stroke="#c6d2e6" stroke-width="2.2"/>
+    </g>
+    <use href="#tunic" fill="none" stroke="#52687a" stroke-width="4.6"/>
+    <path d="M106 276 C124 284 164 284 182 276" fill="none" stroke="#a83a2c" stroke-width="10"/>
+    <path d="M106 276 C124 284 164 284 182 276" fill="none" stroke="#ff7a66" stroke-width="6"/>
+    <path d="M118 280 C112 290 110 298 114 306 L124 300 C122 294 124 288 128 282Z" fill="#ff7a66" stroke="#a83a2c" stroke-width="3.2"/>
+    <!-- 왼팔: 허리에 손 -->
+    <path d="M122 244 C102 248 92 262 96 277 L114 285 C112 273 118 265 128 259Z" fill="#f6f9ff" stroke="#52687a" stroke-width="4"/>
+    <path d="M97 272 L115 280" fill="none" stroke="#3fb4ae" stroke-width="4"/>
+    <circle cx="111" cy="286" r="8.5" fill="#f8d4b6" stroke="#a06a4c" stroke-width="3.2"/>
+    <!-- 오른팔 -->
+    <path d="M166 244 C186 248 200 258 210 271 C206 279 200 283 192 283 C186 272 176 264 160 260Z" fill="#f6f9ff" stroke="#52687a" stroke-width="4"/>
+    <path d="M194 282 C200 279 205 275 208 270" fill="none" stroke="#3fb4ae" stroke-width="4"/>
+    <circle cx="205" cy="281" r="8.5" fill="#f8d4b6" stroke="#a06a4c" stroke-width="3.2"/>
+    <!-- 목에 두른 목도리 -->
+    <path d="M114 240 C128 252 160 252 174 240 C177 252 168 262 144 263 C120 262 111 252 114 240Z" fill="#ff8a70" stroke="#a83a2c" stroke-width="4"/>
+    <path d="M124 252 C136 257 152 257 164 252" fill="none" stroke="#ffb09e" stroke-width="2.4"/>
+  </g>
+
+  <g id="L-head">
+    <g transform="translate(144 244) scale(1.2) translate(-144 -244)">
+      <use href="#face" fill="#f8d4b6"/>
+      <g clip-path="url(#c-face)">
+        <use href="#bang" fill="#e8b795" transform="translate(0 8)"/>
+        <path d="M82 214 C104 246 184 246 206 214 V250 H82Z" fill="#efc09f" opacity=".7"/>
+      </g>
+      <use href="#face" fill="none" stroke="#a06a4c" stroke-width="4"/>
+      <g id="eyes-open">
+        <use href="#eye" transform="translate(119 204) scale(-1 1)"/>
+        <use href="#eye" transform="translate(169 204)"/>
+        <use href="#lash" transform="translate(119 204) scale(-1 1)"/>
+        <use href="#lash" transform="translate(169 204)"/>
+      </g>
+      <g id="eyes-closed" display="none">
+        <use href="#lid" transform="translate(119 206) scale(-1 1)"/>
+        <use href="#lid" transform="translate(169 206)"/>
+      </g>
+      <ellipse cx="100" cy="222" rx="10" ry="5.5" fill="#ff8fa3" opacity=".45"/>
+      <ellipse cx="188" cy="222" rx="10" ry="5.5" fill="#ff8fa3" opacity=".45"/>
+      <path d="M95 224 l3 -5 M100 225 l3 -5 M183 225 l3 -5 M188 225 l3 -5" stroke="#e86a84" stroke-width="1.4" fill="none"/>
+      <!-- 자신만만한 웃음과 송곳니 -->
+      <path d="M130 219 Q146 238 160 216 Q146 223 130 219Z" fill="#a8324a" stroke="#6e1c2e" stroke-width="2.4"/>
+      <path d="M150 221 l3 7 l4 -8z" fill="#fff"/>
+      <!-- 앞머리 -->
+      <use href="#bang" fill="url(#hairG)"/>
+      <g clip-path="url(#c-bang)">
+        <path d="M150 120 C186 130 212 152 210 196 L176 168 L162 198 L150 166Z" fill="#36a8a2" opacity=".7"/>
+        <path d="M96 150 C106 138 122 132 138 130" fill="none" stroke="#c8fff6" stroke-width="5" opacity=".7"/>
+      </g>
+      <use href="#bang" fill="none" stroke="#1c6b68" stroke-width="4"/>
+      <path d="M132 126 L138 100 L152 124" fill="#4fc6c0" stroke="#1c6b68" stroke-width="4"/>
+      <!-- 머리띠 -->
+      <path d="M80 166 C100 150 188 150 208 166" fill="none" stroke="#a83a2c" stroke-width="14"/>
+      <path d="M80 166 C100 150 188 150 208 166" fill="none" stroke="#ff7a66" stroke-width="8"/>
+      <path d="M92 156 C110 150 130 148 150 148" fill="none" stroke="#ffb09e" stroke-width="2.2"/>
+      <circle cx="206" cy="166" r="7" fill="#ff7a66" stroke="#a83a2c" stroke-width="3.2"/>
+    </g>
+  </g>
+</svg>

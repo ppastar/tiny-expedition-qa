@@ -1,0 +1,281 @@
+{
+  "version": 1,
+  "units": [
+    {
+      "key": "c_acorn",
+      "hash": "8db4493da83b908d",
+      "ppu": 352,
+      "layers": [
+        "back",
+        "body",
+        "head"
+      ],
+      "blink": "head",
+      "neck": {
+        "x": 0,
+        "y": 0.6136
+      },
+      "flap": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "key": "c_ella",
+      "hash": "d3515f215f881347",
+      "ppu": 352,
+      "layers": [
+        "back",
+        "body",
+        "head"
+      ],
+      "blink": "head",
+      "neck": {
+        "x": 0,
+        "y": 0.6136
+      },
+      "flap": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "key": "c_firefly",
+      "hash": "079a1f409fb10fde",
+      "ppu": 352,
+      "layers": [
+        "back",
+        "body",
+        "head"
+      ],
+      "blink": "head",
+      "neck": {
+        "x": 0,
+        "y": 0.6136
+      },
+      "flap": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "key": "c_kai",
+      "hash": "96f060e91211fd48",
+      "ppu": 352,
+      "layers": [
+        "back",
+        "body",
+        "head"
+      ],
+      "blink": "head",
+      "neck": {
+        "x": 0,
+        "y": 0.6136
+      },
+      "flap": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "key": "c_lumi",
+      "hash": "bf5f572085b94f9c",
+      "ppu": 352,
+      "layers": [
+        "back",
+        "body",
+        "head"
+      ],
+      "blink": "head",
+      "neck": {
+        "x": 0,
+        "y": 0.6136
+      },
+      "flap": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "key": "c_moss",
+      "hash": "90ccd2024af85634",
+      "ppu": 352,
+      "layers": [
+        "back",
+        "body",
+        "head"
+      ],
+      "blink": "head",
+      "neck": {
+        "x": 0,
+        "y": 0.6136
+      },
+      "flap": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "key": "c_mushroom",
+      "hash": "c2f07678d6be6fae",
+      "ppu": 352,
+      "layers": [
+        "back",
+        "body",
+        "head"
+      ],
+      "blink": "head",
+      "neck": {
+        "x": 0,
+        "y": 0.6136
+      },
+      "flap": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "key": "c_pebble",
+      "hash": "d8d57606cf21bd37",
+      "ppu": 352,
+      "layers": [
+        "body",
+        "head"
+      ],
+      "blink": "head",
+      "neck": {
+        "x": 0,
+        "y": 0.6136
+      },
+      "flap": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "key": "c_reed",
+      "hash": "870e98d4c3e43e3e",
+      "ppu": 352,
+      "layers": [
+        "back",
+        "body",
+        "head"
+      ],
+      "blink": "head",
+      "neck": {
+        "x": 0,
+        "y": 0.6136
+      },
+      "flap": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "key": "e_bat",
+      "hash": "4de157b6fed81932",
+      "ppu": 330,
+      "layers": [
+        "wings",
+        "body"
+      ],
+      "blink": "body",
+      "neck": {
+        "x": 0,
+        "y": 0
+      },
+      "flap": {
+        "x": 0,
+        "y": 0.7394
+      }
+    },
+    {
+      "key": "e_fairy",
+      "hash": "53ece9fe616edfa3",
+      "ppu": 350,
+      "layers": [
+        "wings",
+        "body"
+      ],
+      "blink": "body",
+      "neck": {
+        "x": 0,
+        "y": 0
+      },
+      "flap": {
+        "x": 0,
+        "y": 0.7543
+      }
+    },
+    {
+      "key": "e_frog",
+      "hash": "f4388d9fa252c2fb",
+      "ppu": 330,
+      "layers": [
+        "body"
+      ],
+      "blink": "body",
+      "neck": {
+        "x": 0,
+        "y": 0
+      },
+      "flap": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "key": "e_golem",
+      "hash": "5662b9ab4dd274a9",
+      "ppu": 250,
+      "layers": [
+        "body",
+        "head"
+      ],
+      "blink": "head",
+      "neck": {
+        "x": 0,
+        "y": 1.904
+      },
+      "flap": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "key": "e_snail",
+      "hash": "0f22793dec0d4c01",
+      "ppu": 300,
+      "layers": [
+        "body",
+        "head"
+      ],
+      "blink": "head",
+      "neck": {
+        "x": 0.4667,
+        "y": 0.2667
+      },
+      "flap": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "key": "e_spider",
+      "hash": "bbb72a0efa3c09eb",
+      "ppu": 330,
+      "layers": [
+        "body"
+      ],
+      "blink": "body",
+      "neck": {
+        "x": 0,
+        "y": 0
+      },
+      "flap": {
+        "x": 0,
+        "y": 0
+      }
+    }
+  ]
+}

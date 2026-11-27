@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 400" data-ppu="125" data-neck="180 162" stroke-linejoin="round" stroke-linecap="round">
+  <!-- 골렘: 나무껍질 몸에 이끼가 덮인 숲 골렘. 빛나는 눈과 가슴의 호박색 핵 -->
+  <defs>
+    <linearGradient id="barkG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b98c64"/><stop offset=".55" stop-color="#9a7250"/><stop offset="1" stop-color="#77563a"/></linearGradient>
+    <linearGradient id="barkD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a6446"/><stop offset="1" stop-color="#6a4a32"/></linearGradient>
+    <radialGradient id="coreG" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#fff8cf"/><stop offset=".5" stop-color="#ffc24a"/><stop offset="1" stop-color="#e07a1a"/></radialGradient>
+    <radialGradient id="glowG" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffe27a" stop-opacity=".9"/><stop offset="1" stop-color="#ffe27a" stop-opacity="0"/></radialGradient>
+    <path id="torso" d="M92 150 C120 132 240 132 268 150 C290 176 292 250 280 300 C270 332 230 344 180 344 C130 344 90 332 80 300 C68 250 70 176 92 150 Z"/>
+    <path id="headShape" d="M112 52 C130 38 230 38 248 52 C262 66 266 120 256 146 C246 164 114 164 104 146 C94 120 98 66 112 52 Z"/>
+    <path id="armShape" d="M58 150 C34 152 20 176 20 210 L16 286 C2 300 0 330 14 350 C30 370 66 368 80 348 C92 330 88 302 76 288 L84 200 C86 172 76 150 58 150 Z"/>
+    <path id="leg" d="M92 322 H164 C170 340 170 372 166 392 H88 C82 372 84 340 92 322 Z"/>
+    <clipPath id="c-torso"><use href="#torso"/></clipPath>
+    <clipPath id="c-head"><use href="#headShape"/></clipPath>
+    <clipPath id="c-arm"><use href="#armShape"/></clipPath>
+    <g id="arm">
+      <use href="#armShape" fill="url(#barkG)"/>
+      <g clip-path="url(#c-arm)">
+        <path d="M50 150 C74 200 70 300 90 380 H110 V140Z" fill="#5a3e28" opacity=".38"/>
+        <path d="M0 300 C20 330 60 336 96 312 V380 H0Z" fill="#5a3e28" opacity=".35"/>
+        <path d="M34 190 C30 220 32 250 28 280 M54 180 C52 214 56 240 50 276" fill="none" stroke="#6a4a32" stroke-width="3"/>
+        <path d="M22 316 q12 -8 24 0 q12 -8 24 0" fill="none" stroke="#6a4a32" stroke-width="3.2"/>
+      </g>
+      <use href="#armShape" fill="none" stroke="#3d2a1c" stroke-width="5.4"/>
+      <path d="M14 172 C22 148 50 136 78 146 C92 154 96 170 90 180 C70 172 40 172 14 172 Z" fill="#86c45a" stroke="#3f6a2a" stroke-width="4.6"/>
+      <path d="M30 162 C42 152 60 150 76 156" fill="none" stroke="#b4e58a" stroke-width="3.2"/>
+    </g>
+  </defs>
+
+  <g id="L-body">
+    <!-- 다리 -->
+    <use href="#leg" fill="url(#barkD)" stroke="#3d2a1c" stroke-width="5.4"/>
+    <use href="#leg" fill="url(#barkD)" stroke="#3d2a1c" stroke-width="5.4" transform="translate(360 0) scale(-1 1)"/>
+    <path d="M104 344 v36 M128 340 v42 M150 346 v34 M232 344 v36 M256 340 v42 M210 346 v34" fill="none" stroke="#523824" stroke-width="3"/>
+    <!-- 팔 -->
+    <use href="#arm" transform="translate(5 0)"/><use href="#arm" transform="translate(355 0) scale(-1 1)"/>
+    <!-- 몸통 -->
+    <use href="#torso" fill="url(#barkG)"/>
+    <g clip-path="url(#c-torso)">
+      <path d="M60 270 C110 340 250 340 300 250 V360 H60Z" fill="#5a3e28" opacity=".4"/>
+      <path d="M200 130 C240 180 250 260 232 350 H300 V130Z" fill="#5a3e28" opacity=".22"/>
+      <path d="M118 176 C112 216 116 256 108 300 M144 168 C150 196 132 218 140 248 C144 268 136 290 140 320 M236 180 C246 220 236 262 246 304" fill="none" stroke="#6a4a32" stroke-width="3.6"/>
+      <path d="M100 176 C110 160 132 152 156 150" fill="none" stroke="#e0b88c" stroke-width="6" opacity=".55"/>
+      <path d="M70 318 C100 300 130 312 150 332 C120 350 90 346 70 318Z" fill="#86c45a" stroke="#3f6a2a" stroke-width="3.2"/>
+    </g>
+    <use href="#torso" fill="none" stroke="#3d2a1c" stroke-width="5.4"/>
+    <!-- 가슴의 핵 -->
+    <circle cx="190" cy="246" r="40" fill="url(#glowG)"/>
+    <path d="M190 220 L212 240 L204 268 L176 268 L168 240 Z" fill="url(#coreG)" stroke="#7a3f10" stroke-width="4.6"/>
+    <path d="M190 220 L190 246 L212 240 M190 246 L176 268 M190 246 L168 240" fill="none" stroke="#fff3b0" stroke-width="2" opacity=".85"/>
+    <path d="M154 216 L170 232 M226 222 L214 234 M160 286 L176 274" fill="none" stroke="#3d2a1c" stroke-width="3.2"/>
+  </g>
+
+  <g id="L-head">
+    <use href="#headShape" fill="url(#barkG)"/>
+    <g clip-path="url(#c-head)">
+      <path d="M90 130 C130 168 230 168 270 124 V180 H90Z" fill="#5a3e28" opacity=".42"/>
+      <path d="M116 80 C122 64 140 54 160 52" fill="none" stroke="#e0b88c" stroke-width="6" opacity=".55"/>
+      <path d="M232 60 C240 84 238 110 244 140" fill="none" stroke="#6a4a32" stroke-width="3.2"/>
+    </g>
+    <use href="#headShape" fill="none" stroke="#3d2a1c" stroke-width="5.4"/>
+    <!-- 눈구멍 -->
+    <path d="M124 84 C140 76 220 76 236 84 C244 98 244 118 236 130 C220 138 140 138 124 130 C116 118 116 98 124 84 Z" fill="#3a2a1e" stroke="#2a1c12" stroke-width="4"/>
+    <g id="eyes-open">
+      <circle cx="152" cy="108" r="26" fill="url(#glowG)"/><circle cx="208" cy="108" r="26" fill="url(#glowG)"/>
+      <ellipse cx="152" cy="108" rx="12" ry="13" fill="#fff3b0" stroke="#ffb347" stroke-width="3.2"/>
+      <ellipse cx="208" cy="108" rx="12" ry="13" fill="#fff3b0" stroke="#ffb347" stroke-width="3.2"/>
+      <circle cx="148" cy="104" r="3.6" fill="#fff"/><circle cx="204" cy="104" r="3.6" fill="#fff"/>
+      <path d="M130 84 L172 96 M230 84 L188 96" fill="none" stroke="#2a1c12" stroke-width="9"/>
+    </g>
+    <g id="eyes-closed" display="none">
+      <path d="M140 110 H164 M196 110 H220" fill="none" stroke="#ffcf6a" stroke-width="5"/>
+    </g>
+    <path d="M156 150 h10 v-8 h10 v8 h10 v-8 h10 v8 h8" fill="none" stroke="#3d2a1c" stroke-width="3.6"/>
+    <!-- 머리 위 이끼와 새싹 -->
+    <path d="M100 66 C96 40 126 22 156 26 C176 14 214 18 236 32 C258 38 266 56 260 70 C246 60 232 66 220 58 C206 70 186 60 172 66 C156 58 140 72 126 62 C116 70 106 70 100 66 Z" fill="#86c45a" stroke="#3f6a2a" stroke-width="5"/>
+    <path d="M122 46 C138 34 160 32 178 36 M200 34 C216 34 232 40 244 50" fill="none" stroke="#b4e58a" stroke-width="4"/>
+    <path d="M186 28 C186 16 190 8 196 4" fill="none" stroke="#3f6a2a" stroke-width="4"/>
+    <path d="M196 6 C208 -2 224 2 228 14 C216 22 202 18 196 6 Z" fill="#a6e07a" stroke="#3f6a2a" stroke-width="3.6"/>
+  </g>
+</svg>
