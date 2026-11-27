@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" data-ppu="165" data-flap="160 118" stroke-linejoin="round" stroke-linecap="round">
+  <!-- 동굴 박쥐: 보라 털뭉치, 노란 눈, 작은 송곳니 -->
+  <defs>
+    <radialGradient id="batG" cx="38%" cy="28%" r="80%"><stop offset="0" stop-color="#a48be0"/><stop offset=".6" stop-color="#7d62ba"/><stop offset="1" stop-color="#5f469c"/></radialGradient>
+    <linearGradient id="wingG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7158ae"/><stop offset="1" stop-color="#48367e"/></linearGradient>
+    <linearGradient id="eyeG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f29a00"/><stop offset="1" stop-color="#fff08a"/></linearGradient>
+    <path id="bodyShape" d="M160 70 C196 70 220 96 220 128 C220 138 218 146 214 152 L224 159 L210 163 C200 179 182 189 160 189 C138 189 120 179 110 163 L96 159 L106 152 C102 146 100 138 100 128 C100 96 124 70 160 70 Z"/>
+    <clipPath id="c-body"><use href="#bodyShape"/></clipPath>
+    <g id="wing">
+      <path d="M186 110 C204 62 250 36 304 40 C296 60 298 78 310 94 C292 92 280 100 274 116 C260 108 246 112 240 128 C228 120 212 122 200 138 Z" fill="url(#wingG)" stroke="#2e2350" stroke-width="5"/>
+      <path d="M250 60 C262 72 268 92 272 112 M222 84 C232 96 238 110 240 124" fill="none" stroke="#8a72c8" stroke-width="2" opacity=".6"/>
+      <path d="M190 112 L302 42 M190 115 L273 114 M190 118 L239 126" fill="none" stroke="#33265c" stroke-width="4.6"/>
+      <path d="M228 86 l-2 -12 l9 7z" fill="#e9e2f7" stroke="#2e2350" stroke-width="2"/>
+    </g>
+    <g id="ear">
+      <path d="M116 86 C104 58 106 34 114 20 C134 34 148 54 152 76 Z" fill="#7d62ba" stroke="#2e2350" stroke-width="5"/>
+      <path d="M121 76 C114 58 115 46 118 36 C130 46 138 58 142 72Z" fill="#ffb3c7"/>
+      <path d="M124 70 C120 58 120 50 121 44" fill="none" stroke="#e98aa6" stroke-width="2"/>
+    </g>
+    <g id="eye">
+      <ellipse rx="12.5" ry="15.5" fill="#2b2238"/>
+      <ellipse cy="1" rx="10" ry="13" fill="url(#eyeG)"/>
+      <ellipse cy="1" rx="3.6" ry="9.5" fill="#3a1f00"/>
+      <circle cx="-4" cy="-6" r="3.6" fill="#fff"/><circle cx="4" cy="7" r="1.8" fill="#fff"/>
+    </g>
+  </defs>
+
+  <g id="L-wings">
+    <use href="#wing"/><use href="#wing" transform="translate(320 0) scale(-1 1)"/>
+  </g>
+
+  <g id="L-body">
+    <use href="#ear"/><use href="#ear" transform="translate(320 0) scale(-1 1)"/>
+    <ellipse cx="147" cy="190" rx="8" ry="6" fill="#5a4590" stroke="#2e2350" stroke-width="4"/>
+    <ellipse cx="173" cy="190" rx="8" ry="6" fill="#5a4590" stroke="#2e2350" stroke-width="4"/>
+    <use href="#bodyShape" fill="url(#batG)"/>
+    <g clip-path="url(#c-body)">
+      <path d="M96 146 C126 196 204 194 226 132 V200 H96Z" fill="#4a3880" opacity=".38"/>
+      <ellipse cx="160" cy="162" rx="30" ry="21" fill="#c3b0ef"/>
+      <path d="M146 150 l3 6 M160 148 l0 7 M174 150 l-3 6" stroke="#a48be0" stroke-width="2" fill="none"/>
+      <path d="M118 104 C126 88 142 80 156 78" fill="none" stroke="#fff" stroke-width="6" opacity=".3"/>
+    </g>
+    <use href="#bodyShape" fill="none" stroke="#2e2350" stroke-width="5"/>
+    <path d="M150 73 L153 57 L160 68 L167 55 L171 73" fill="#8f76cc" stroke="#2e2350" stroke-width="4.6"/>
+    <g id="eyes-open">
+      <use href="#eye" transform="translate(139 122)"/><use href="#eye" transform="translate(181 122)"/>
+      <path d="M123 108 L152 114 M197 108 L168 114" stroke="#2e2350" stroke-width="6" fill="none"/>
+    </g>
+    <g id="eyes-closed" display="none">
+      <path d="M127 120 Q139 130 151 122 M193 120 Q181 130 169 122" stroke="#2e2350" stroke-width="5.4" fill="none"/>
+    </g>
+    <ellipse cx="117" cy="144" rx="9" ry="5" fill="#ff8fa3" opacity=".55"/><ellipse cx="203" cy="144" rx="9" ry="5" fill="#ff8fa3" opacity=".55"/>
+    <path d="M147 146 Q160 162 173 146 Z" fill="#5a1f3a" stroke="#2e2350" stroke-width="3.2"/>
+    <path d="M150 147 l3.5 9 l3.5 -9z M163 147 l3.5 9 l3.5 -9z" fill="#fff" stroke="#2e2350" stroke-width="1.2"/>
+  </g>
+</svg>

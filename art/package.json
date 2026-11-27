@@ -1,0 +1,14 @@
+{
+  "name": "tiny-expedition-art",
+  "private": true,
+  "type": "module",
+  "description": "전투 캐릭터 SVG 원본을 PNG(부위별 레이어)로 바꾸는 도구",
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "render": "node render.mjs",
+    "check": "node render.mjs --check"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "2.6.2"
+  }
+}

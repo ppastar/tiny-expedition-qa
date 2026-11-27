@@ -96,7 +96,7 @@ $ qa turn-replay --stage T-1 --party c_kai,c_firefly,c_acorn --seed 3 --commands
 - **게임이 스스로 대조합니다.** 재생이 끝날 때마다 화면 상태와 Core 상태를 비교해 다르면 `[TurnView]` 오류 로그(시드·명령 수 포함)를 남깁니다. PlayMode 테스트는 오류 로그가 있으면 실패하고, 자동 플레이는 불일치 수가 0인지 확인합니다.
 - **연출 중에는 명령을 받지 않습니다.** 연타로 다음 차례 명령이 잘못 들어가는 것을 막습니다 (TURN-030).
 
-그림은 전부 코드로 그렸습니다(외부 에셋 없음) — [`ART.md`](ART.md).
+캐릭터·적은 이 프로젝트에서 직접 그린 SVG 일러스트를 부위별 PNG로 바꿔 세우고, 숨쉬기·머리 까딱임·눈 깜빡임·날갯짓을 붙였습니다. 이 움직임도 재생 쪽에만 있어 전투 결과와 무관합니다. 그림 파일이 빠지면 기본 그림으로 대신하고(ART-006), 누락은 테스트가 잡습니다(ART-001~005). 외부 에셋 없음 — [`ART.md`](ART.md).
 
 ## 4. TC 추적 리포트 `qa report`
 
@@ -115,7 +115,7 @@ $ qa report --results dotnet=artifacts/dotnet-results.xml,qa-tool=artifacts/qato
 ## 5. 뮤테이션 스모크 `scripts/mutation_smoke.py`
 
 "테스트가 다 통과한다"는 것만으로는 테스트가 버그를 잡는지 알 수 없어서,
-실제로 생길 법한 버그 38개(천장 off-by-one, 10연 안에서 천장 카운트 초기화 누락, `<`/`<=` 경계 혼동, 보상 중복 지급, 실패한 모집의 재화 차감, 콤보 초기화 누락, 턴제 쿨타임 off-by-one·동시 전멸 오판·기절 합산, qa-tool이 시드를 long으로 읽음 등)를 코드에 하나씩 넣고 테스트가 실패하는지 확인합니다.
+실제로 생길 법한 버그 40개(천장 off-by-one, 10연 안에서 천장 카운트 초기화 누락, `<`/`<=` 경계 혼동, 보상 중복 지급, 실패한 모집의 재화 차감, 콤보 초기화 누락, 턴제 쿨타임 off-by-one·동시 전멸 오판·기절 합산, qa-tool이 시드를 long으로 읽음 등)를 코드에 하나씩 넣고 테스트가 실패하는지 확인합니다.
 
 ```
 [검출] 천장 off-by-one (90번째가 아니라 91번째에 확정)  ← GACHA-004, GACHA-005, GACHA-011, GACHA-016, GACHA-017, GACHA-018
@@ -132,7 +132,7 @@ $ qa report --results dotnet=artifacts/dotnet-results.xml,qa-tool=artifacts/qato
 [검출] [qa-tool] 시드를 long으로 읽음 (long 최대값보다 큰 시드 거부, 음수는 큰 시드로 바뀜)  ← TOOL-001, TOOL-002, TOOL-003, TOOL-004
 [검출] [qa-tool] battle-replay만 시드를 long으로 읽음 (호출부 되돌림)  ← TOOL-004
 
-검출 38/38
+검출 40/40
 ```
 
 ## 6. 게임 안 QA 디버그 패널

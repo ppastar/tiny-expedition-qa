@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 288 352" data-ppu="176" data-neck="144 244" stroke-linejoin="round" stroke-linecap="round">
+  <!-- 조약돌 기사: 회색 짧은 머리, 강철 투구와 파란 깃, 파란 갑옷, 돌 방패와 검 -->
+  <defs>
+    <linearGradient id="steelG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6ecf6"/><stop offset=".5" stop-color="#b9c3d6"/><stop offset="1" stop-color="#8c98b2"/></linearGradient>
+    <linearGradient id="irisG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1f3766"/><stop offset=".55" stop-color="#4a6ea8"/><stop offset="1" stop-color="#9cc4f2"/></linearGradient>
+    <linearGradient id="bladeG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c3cde0"/></linearGradient>
+    <path id="face" d="M82 182 C82 142 110 124 144 124 C178 124 206 142 206 182 C206 216 180 242 144 242 C108 242 82 216 82 182Z"/>
+    <path id="bang" d="M82 186 C82 160 100 150 144 150 C188 150 206 160 206 186 C200 180 194 178 188 180 C186 174 180 170 172 170 C172 178 166 184 158 186 C158 178 154 172 148 170 C144 178 136 184 126 186 C128 178 126 172 122 170 C116 178 106 182 96 180 C90 182 86 184 82 186Z"/>
+    <path id="dome" d="M74 176 C68 126 100 104 144 104 C188 104 220 126 214 176 C196 164 172 160 144 160 C116 160 92 164 74 176Z"/>
+    <path id="cheek" d="M76 172 C68 198 74 224 92 240 C98 224 98 200 94 178Z"/>
+    <path id="torso" d="M116 242 C108 262 106 286 104 302 C120 313 168 313 184 302 C182 286 180 262 172 242 C160 236 128 236 116 242Z"/>
+    <path id="shield" d="M58 250 C74 243 108 243 124 250 C126 284 118 308 91 322 C64 308 56 284 58 250Z"/>
+    <path id="boot" d="M122 316 h20 v13 a7 7 0 0 1 -7 7 h-13 a7 7 0 0 1 -7 -7 v-1 a9 9 0 0 1 7 -12z"/>
+    <clipPath id="c-face"><use href="#face"/></clipPath>
+    <clipPath id="c-dome"><use href="#dome"/></clipPath>
+    <clipPath id="c-torso"><use href="#torso"/></clipPath>
+    <clipPath id="c-shield"><use href="#shield"/></clipPath>
+    <g id="eye">
+      <ellipse rx="12" ry="15" fill="#fff"/>
+      <ellipse cy="1" rx="10.5" ry="13.5" fill="url(#irisG)"/>
+      <ellipse cy="0" rx="4.8" ry="7" fill="#14213f"/>
+      <ellipse cy="9" rx="5.5" ry="3" fill="#cfe6ff" opacity=".75"/>
+      <circle cx="-4" cy="-6.5" r="4.2" fill="#fff"/><circle cx="4.4" cy="6" r="1.9" fill="#fff"/>
+    </g>
+    <g id="lash">
+      <path d="M-16 -9 C-8 -18 8 -18 15 -10 C8 -13 -6 -13 -12 -8 C-13 -6 -15 -5 -18 -5 Z" fill="#2f3345"/>
+      <path d="M-7 14.5 q7 3 14 0" fill="none" stroke="#a06a4c" stroke-width="1.6"/>
+    </g>
+    <g id="lid">
+      <path d="M-13 2 Q0 -6 13 2" fill="none" stroke="#2f3345" stroke-width="5"/>
+    </g>
+  </defs>
+
+  <g id="L-body">
+    <!-- 다리 -->
+    <rect x="125" y="298" width="16" height="22" rx="4" fill="#9aa6bf" stroke="#4a5368" stroke-width="3.2"/>
+    <rect x="147" y="298" width="16" height="22" rx="4" fill="#9aa6bf" stroke="#4a5368" stroke-width="3.2"/>
+    <use href="#boot" fill="#4b556e" stroke="#262c3d" stroke-width="4"/>
+    <use href="#boot" fill="#4b556e" stroke="#262c3d" stroke-width="4" transform="translate(288 0) scale(-1 1)"/>
+    <path d="M119 323 h20 M149 323 h20" stroke="#8792ad" stroke-width="2.5" fill="none"/>
+    <!-- 오른팔과 검 (몸 뒤) -->
+    <path d="M202.6 275.4 L246.5 185.8 L258 172 L255.5 190.2 L213.4 280.6Z" fill="url(#bladeG)" stroke="#55617a" stroke-width="3.2"/>
+    <path d="M210 272 L252 186" fill="none" stroke="#aeb9cf" stroke-width="2"/>
+    <path d="M195 271 L221 285" fill="none" stroke="#6b4a12" stroke-width="11"/>
+    <path d="M195 271 L221 285" fill="none" stroke="#f0c552" stroke-width="6"/>
+    <path d="M206 280 L198 298" fill="none" stroke="#5e3d1e" stroke-width="8"/>
+    <circle cx="197" cy="300" r="5" fill="#f0c552" stroke="#6b4a12" stroke-width="2.4"/>
+    <!-- 갑옷 몸통 -->
+    <use href="#torso" fill="#6f86b8"/>
+    <g clip-path="url(#c-torso)">
+      <path d="M152 234 C166 262 170 290 164 316 L190 316 L190 234Z" fill="#566d9e"/>
+      <ellipse cx="144" cy="240" rx="34" ry="13" fill="#4f6492"/>
+      <path d="M118 256 C130 270 158 270 170 256" fill="none" stroke="#dfe5f2" stroke-width="5"/>
+      <path d="M144 286 V314" stroke="#3d4f7a" stroke-width="3" fill="none"/>
+      <path d="M104 300 C122 310 166 310 184 300" fill="none" stroke="#dfe5f2" stroke-width="5"/>
+      <path d="M118 262 C116 274 116 280 118 286" fill="none" stroke="#9db0d8" stroke-width="3"/>
+    </g>
+    <use href="#torso" fill="none" stroke="#33415f" stroke-width="4.6"/>
+    <path d="M107 284 C124 290 164 290 181 284" fill="none" stroke="#3a4560" stroke-width="7"/>
+    <rect x="137" y="279" width="14" height="12" rx="3" fill="#f0c552" stroke="#6b4a12" stroke-width="2.4"/>
+    <ellipse cx="144" cy="266" rx="7" ry="5.5" fill="#dfe5f2" stroke="#55617a" stroke-width="2"/>
+    <!-- 오른팔 -->
+    <path d="M176 250 C192 256 202 266 208 278 C204 286 198 290 191 290 C187 278 179 270 166 264Z" fill="#6f86b8" stroke="#33415f" stroke-width="4"/>
+    <circle cx="203" cy="284" r="9.5" fill="url(#steelG)" stroke="#4a5368" stroke-width="3.2"/>
+    <!-- 어깨 갑옷 -->
+    <ellipse cx="114" cy="252" rx="17" ry="13" fill="url(#steelG)" stroke="#4a5368" stroke-width="4" transform="rotate(-18 114 252)"/>
+    <ellipse cx="174" cy="252" rx="17" ry="13" fill="url(#steelG)" stroke="#4a5368" stroke-width="4" transform="rotate(18 174 252)"/>
+    <path d="M104 250 q8 -8 18 -6 M166 244 q10 -2 18 6" fill="none" stroke="#fff" stroke-width="2.4" opacity=".7"/>
+    <!-- 왼팔과 돌 방패 -->
+    <path d="M110 256 C98 264 94 278 96 290 L112 292 C112 280 116 270 124 264Z" fill="#6f86b8" stroke="#33415f" stroke-width="4"/>
+    <use href="#shield" fill="#a9b1c2"/>
+    <g clip-path="url(#c-shield)">
+      <path d="M96 240 C110 270 108 300 92 326 L130 326 L130 240Z" fill="#8c95a8"/>
+      <path d="M66 254 C78 249 104 249 116 254 C117 280 111 298 91 310 C71 298 65 280 66 254Z" fill="#c6ccd8" opacity=".75"/>
+      <path d="M74 262 l10 12 l-6 12 l12 12 M108 262 l-6 10 l8 8" fill="none" stroke="#7c8496" stroke-width="2.6"/>
+      <ellipse cx="90" cy="278" rx="11" ry="8" fill="#e6eaf2" stroke="#6b7388" stroke-width="2.4"/>
+      <ellipse cx="103" cy="291" rx="6" ry="4.5" fill="#dfe5f2" stroke="#6b7388" stroke-width="2"/>
+      <ellipse cx="79" cy="292" rx="5" ry="4" fill="#dfe5f2" stroke="#6b7388" stroke-width="2"/>
+    </g>
+    <use href="#shield" fill="none" stroke="#4d5568" stroke-width="5"/>
+    <path d="M66 258 q4 -6 14 -8" fill="none" stroke="#fff" stroke-width="3" opacity=".7"/>
+  </g>
+
+  <g id="L-head">
+    <g transform="translate(144 244) scale(1.2) translate(-144 -244)">
+      <use href="#face" fill="#f8d4b6"/>
+      <g clip-path="url(#c-face)">
+        <use href="#bang" fill="#e8b795" transform="translate(0 8)"/>
+        <path d="M82 214 C104 246 184 246 206 214 V250 H82Z" fill="#efc09f" opacity=".7"/>
+      </g>
+      <use href="#face" fill="none" stroke="#a06a4c" stroke-width="4"/>
+      <g id="eyes-open">
+        <use href="#eye" transform="translate(120 202)"/>
+        <use href="#eye" transform="translate(168 202)"/>
+        <use href="#lash" transform="translate(120 202)"/>
+        <use href="#lash" transform="translate(168 202) scale(-1 1)"/>
+      </g>
+      <g id="eyes-closed" display="none">
+        <use href="#lid" transform="translate(120 204)"/>
+        <use href="#lid" transform="translate(168 204)"/>
+      </g>
+      <ellipse cx="104" cy="220" rx="10" ry="5.5" fill="#ff8fa3" opacity=".5"/>
+      <ellipse cx="184" cy="220" rx="10" ry="5.5" fill="#ff8fa3" opacity=".5"/>
+      <path d="M99 222 l3 -5 M104 223 l3 -5 M179 223 l3 -5 M184 223 l3 -5" stroke="#e86a84" stroke-width="1.4" fill="none"/>
+      <path d="M135 224 Q144 231 153 224" fill="none" stroke="#8a3a3a" stroke-width="3.2"/>
+      <!-- 앞머리 -->
+      <use href="#bang" fill="#9aa2b5" stroke="#555c70" stroke-width="3.2"/>
+      <path d="M112 164 l-4 10 M146 162 l-2 10 M178 164 l4 10" fill="none" stroke="#7a8296" stroke-width="1.8"/>
+      <!-- 투구 -->
+      <use href="#cheek" fill="url(#steelG)" stroke="#4a5368" stroke-width="4"/>
+      <use href="#cheek" fill="url(#steelG)" stroke="#4a5368" stroke-width="4" transform="translate(288 0) scale(-1 1)"/>
+      <path d="M146 110 C152 78 136 56 106 50 C113 62 109 70 100 76 C113 78 118 86 113 97 C126 94 134 100 138 112Z" fill="#6f86b8" stroke="#33415f" stroke-width="4"/>
+      <path d="M140 104 C140 86 132 70 116 60 M132 100 C128 90 122 84 112 80" fill="none" stroke="#9db0d8" stroke-width="2.2"/>
+      <use href="#dome" fill="url(#steelG)"/>
+      <g clip-path="url(#c-dome)">
+        <path d="M160 100 C196 116 212 150 214 180 L230 180 L230 100Z" fill="#7f8ba6" opacity=".55"/>
+        <path d="M92 150 C96 128 112 116 130 112" fill="none" stroke="#fff" stroke-width="7" opacity=".6"/>
+        <path d="M144 104 V162" stroke="#6f7b96" stroke-width="4" fill="none"/>
+      </g>
+      <use href="#dome" fill="none" stroke="#4a5368" stroke-width="4.6"/>
+      <path d="M76 175 C94 163 118 159 144 159 C170 159 194 163 212 175" fill="none" stroke="#4a5368" stroke-width="11"/>
+      <path d="M76 175 C94 163 118 159 144 159 C170 159 194 163 212 175" fill="none" stroke="#8c98b2" stroke-width="6"/>
+      <circle cx="96" cy="166" r="2.2" fill="#e6ecf6"/><circle cx="120" cy="161" r="2.2" fill="#e6ecf6"/><circle cx="168" cy="161" r="2.2" fill="#e6ecf6"/><circle cx="192" cy="166" r="2.2" fill="#e6ecf6"/>
+      <path d="M137 158 h14 v20 q-7 8 -14 0z" fill="url(#steelG)" stroke="#4a5368" stroke-width="3.2"/>
+    </g>
+  </g>
+</svg>

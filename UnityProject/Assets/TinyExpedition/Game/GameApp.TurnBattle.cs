@@ -319,7 +319,7 @@ namespace TinyExpedition.Game
                 face.transform.SetParent(chip, false);
                 face.raycastTarget = false;
                 face.preserveAspect = true;
-                face.sprite = ally ? BattleArt.Ally(_turnParty[u.Slot]) : BattleArt.Enemy(u.Name).Sprite;
+                face.sprite = ally ? BattleArt.Ally(_turnParty[u.Slot]) : BattleArt.Enemy(u.Name).Full;
                 var rt = face.rectTransform;
                 rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
                 // 아군은 전신 그림이라 얼굴이 칩 가운데 오도록 크게 키워 아래로 내린다

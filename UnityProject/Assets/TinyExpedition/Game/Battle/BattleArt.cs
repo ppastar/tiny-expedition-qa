@@ -1,12 +1,16 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
+using TinyExpedition.Core.Data;
 using UnityEngine;
 
 namespace TinyExpedition.Game.Battle
 {
     /// <summary>
-    /// 2.5D 전투에 쓰는 그림을 전부 코드로 만든다 (외부 그림 파일·에셋 없음).
-    /// 머리가 큰 SD 비율의 아군 9명, 적 6종, 배경·바닥·이펙트. 디자인은 이 프로젝트용으로 새로 만든 것이다.
-    /// 한 번 만든 그림은 캐시에 두고 다시 쓴다.
+    /// 2.5D 전투에 쓰는 그림을 만든다.
+    /// 캐릭터·적은 이 프로젝트에서 그린 SVG 일러스트를 PNG로 바꾼 것(StreamingAssets/BattleArt, 원본은 저장소의 art/units)을 읽고,
+    /// 파일이 없으면 코드로 그린 기본 그림으로 대신한다(리소스 누락으로 전투가 막히지 않게). 배경·바닥·이펙트는 코드로 그린다.
+    /// 외부 에셋은 쓰지 않는다. 한 번 만든 그림은 캐시에 두고 다시 쓴다.
     /// </summary>
     public static class BattleArt
     {
@@ -25,6 +29,121 @@ namespace TinyExpedition.Game.Battle
                 if (_material == null) _material = new Material(Shader.Find("Sprites/Default")) { name = "BattleSprite" };
                 return _material;
             }
+        }
+
+        // =====================================================================
+        // 일러스트 (SVG에서 뽑은 부위별 PNG)
+        // =====================================================================
+
+        /// <summary>유닛 한 명의 그림. 일러스트면 부위(뒷머리·날개·몸·머리)가 나뉘어 있고, 기본 그림이면 Body 한 장뿐이다.</summary>
+        public sealed class UnitArt
+        {
+            public string Key;
+            /// <summary>true = 일러스트 파일을 읽음, false = 코드로 그린 기본 그림.</summary>
+            public bool Illustrated;
+            /// <summary>부위를 합친 전신 (초상화·크기 계산용).</summary>
+            public Sprite Full;
+            public Sprite Back, Wings, Body, Head;
+            /// <summary>눈 감은 그림. Head가 있으면 머리, 없으면 몸을 잠깐 이 그림으로 바꾼다.</summary>
+            public Sprite Blink;
+            /// <summary>머리가 까딱이는 축, 날개가 접히는 축 (발밑 가운데 기준, 유닛).</summary>
+            public Vector2 Neck, Flap;
+            public float Hover;
+        }
+
+        [Serializable] private class ManifestPoint { public float x, y; }
+        [Serializable] private class ManifestUnit { public string key; public float ppu; public List<string> layers; public string blink; public ManifestPoint neck, flap; }
+        [Serializable] private class Manifest { public List<ManifestUnit> units; }
+
+        private static string _artDir;
+        private static Dictionary<string, ManifestUnit> _manifest;
+        private static readonly Dictionary<string, UnitArt> ArtCache = new Dictionary<string, UnitArt>();
+        private static readonly HashSet<string> Missing = new HashSet<string>();
+
+        /// <summary>일러스트 폴더. 바꾸면 캐시를 비운다(테스트가 빈 폴더로 누락 상황을 만든다).</summary>
+        public static string ArtDir
+        {
+            get => _artDir ?? (_artDir = DefaultArtDir);
+            set
+            {
+                _artDir = value;
+                _manifest = null;
+                ArtCache.Clear();
+                Missing.Clear();
+            }
+        }
+
+        public static string DefaultArtDir => Path.Combine(Application.streamingAssetsPath, "BattleArt");
+
+        /// <summary>일러스트가 없어 기본 그림으로 대신한 유닛 키 (캐릭터 id, e_&lt;적 종류&gt;).</summary>
+        public static IReadOnlyCollection<string> MissingArt => Missing;
+
+        private static ManifestUnit ManifestFor(string key)
+        {
+            if (_manifest == null)
+            {
+                _manifest = new Dictionary<string, ManifestUnit>();
+                var path = Path.Combine(ArtDir, "manifest.json");
+                if (File.Exists(path))
+                {
+                    var parsed = JsonUtility.FromJson<Manifest>(File.ReadAllText(path));
+                    if (parsed?.units != null)
+                        foreach (var u in parsed.units) _manifest[u.key] = u;
+                }
+            }
+            return _manifest.TryGetValue(key, out var found) ? found : null;
+        }
+
+        private static Sprite LoadLayer(string key, string layer, float ppu)
+        {
+            var path = Path.Combine(ArtDir, key + "." + layer + ".png");
+            if (!File.Exists(path)) return null;
+            var tex = new Texture2D(2, 2, TextureFormat.RGBA32, true) { name = key + "." + layer, wrapMode = TextureWrapMode.Clamp };
+            if (!tex.LoadImage(File.ReadAllBytes(path), true))
+            {
+                Debug.LogWarning("전투 그림 파일을 읽지 못했습니다: " + path);
+                return null;
+            }
+            var sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0f), ppu);
+            sprite.name = tex.name;
+            return sprite;
+        }
+
+        /// <summary>일러스트를 읽는다. 목록에 없거나 파일이 빠졌으면 null.</summary>
+        private static UnitArt LoadIllustration(string key)
+        {
+            var m = ManifestFor(key);
+            if (m == null || m.ppu <= 0) return null;
+            var art = new UnitArt
+            {
+                Key = key, Illustrated = true,
+                Full = LoadLayer(key, "full", m.ppu),
+                Body = LoadLayer(key, "body", m.ppu),
+                Neck = m.neck != null ? new Vector2(m.neck.x, m.neck.y) : Vector2.zero,
+                Flap = m.flap != null ? new Vector2(m.flap.x, m.flap.y) : Vector2.zero,
+            };
+            if (art.Full == null || art.Body == null) return null;
+            var layers = m.layers ?? new List<string>();
+            if (layers.Contains("back") && (art.Back = LoadLayer(key, "back", m.ppu)) == null) return null;
+            if (layers.Contains("wings") && (art.Wings = LoadLayer(key, "wings", m.ppu)) == null) return null;
+            if (layers.Contains("head") && (art.Head = LoadLayer(key, "head", m.ppu)) == null) return null;
+            if (!string.IsNullOrEmpty(m.blink)) art.Blink = LoadLayer(key, "blink", m.ppu); // 없어도 깜빡임만 빠진다
+            return art;
+        }
+
+        private static UnitArt ArtFor(string key, float hover, Func<Sprite> fallback)
+        {
+            if (ArtCache.TryGetValue(key, out var art) && art.Full != null) return art;
+            art = LoadIllustration(key);
+            if (art == null)
+            {
+                Missing.Add(key);
+                var s = fallback();
+                art = new UnitArt { Key = key, Full = s, Body = s };
+            }
+            art.Hover = hover;
+            ArtCache[key] = art;
+            return art;
         }
 
         private delegate Sprite Maker();
@@ -93,8 +212,13 @@ namespace TinyExpedition.Game.Battle
 
         public const float AllyPixelsPerUnit = 176f;
 
-        /// <summary>아군 전신 그림. 발이 아래쪽 가운데(피벗).</summary>
-        public static Sprite Ally(string characterId) => Get("ally:" + characterId, () =>
+        /// <summary>아군 그림 (부위별). 일러스트가 없으면 코드로 그린 기본 그림.</summary>
+        public static UnitArt AllyArt(string characterId) => ArtFor(ArtCatalog.AllyKey(characterId), 0f, () => AllyFallback(characterId));
+
+        /// <summary>아군 전신 그림 한 장 (초상화용). 발이 아래쪽 가운데(피벗).</summary>
+        public static Sprite Ally(string characterId) => AllyArt(characterId).Full;
+
+        private static Sprite AllyFallback(string characterId) => Get("ally:" + characterId, () =>
         {
             var p = new Paint(288, 352);
             DrawChibi(p, LookFor(characterId));
@@ -349,25 +473,21 @@ namespace TinyExpedition.Game.Battle
         // 적
         // =====================================================================
 
-        public struct EnemyArt
+        /// <summary>적 그림 (부위별). 일러스트가 없으면 코드로 그린 기본 그림, 모르는 이름이면 말랑한 덩어리.</summary>
+        public static UnitArt Enemy(string name)
         {
-            public Sprite Sprite;
-            /// <summary>공중에 떠 있는 적은 발밑이 아니라 이만큼 띄워 그린다.</summary>
-            public float Hover;
-        }
-
-        /// <summary>적 이름(데이터)에서 종류를 골라 그림을 만든다. 모르는 이름이면 말랑한 덩어리.</summary>
-        public static EnemyArt Enemy(string name)
-        {
-            name = name ?? "";
-            if (name.Contains("박쥐")) return new EnemyArt { Sprite = Get("enemy:bat", Bat), Hover = 0.75f };
-            if (name.Contains("거미")) return new EnemyArt { Sprite = Get("enemy:spider", Spider) };
-            if (name.Contains("달팽이")) return new EnemyArt { Sprite = Get("enemy:snail", Snail) };
-            if (name.Contains("개구리")) return new EnemyArt { Sprite = Get("enemy:frog", Frog) };
-            if (name.Contains("요정")) return new EnemyArt { Sprite = Get("enemy:fairy", Fairy), Hover = 0.55f };
-            if (name.Contains("골렘")) return new EnemyArt { Sprite = Get("enemy:golem", Golem) };
-            uint h = Hash(name);
-            return new EnemyArt { Sprite = Get("enemy:blob:" + (h % 6), () => Blob(Color.HSVToRGB((h % 6) / 6f, 0.45f, 0.9f))) };
+            switch (ArtCatalog.EnemyKey(name))
+            {
+                case "e_bat": return ArtFor("e_bat", 0.75f, () => Get("enemy:bat", Bat));
+                case "e_spider": return ArtFor("e_spider", 0f, () => Get("enemy:spider", Spider));
+                case "e_snail": return ArtFor("e_snail", 0f, () => Get("enemy:snail", Snail));
+                case "e_frog": return ArtFor("e_frog", 0f, () => Get("enemy:frog", Frog));
+                case "e_fairy": return ArtFor("e_fairy", 0.55f, () => Get("enemy:fairy", Fairy));
+                case "e_golem": return ArtFor("e_golem", 0f, () => Get("enemy:golem", Golem));
+            }
+            uint h = Hash(name ?? "");
+            var blob = Get("enemy:blob:" + (h % 6), () => Blob(Color.HSVToRGB((h % 6) / 6f, 0.45f, 0.9f)));
+            return new UnitArt { Key = "blob", Full = blob, Body = blob };
         }
 
         private static Sprite Bat()

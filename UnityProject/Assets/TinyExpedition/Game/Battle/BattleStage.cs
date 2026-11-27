@@ -43,7 +43,9 @@ namespace TinyExpedition.Game.Battle
         {
             public DisplayUnit Model;
             public Transform Root;
-            public SpriteRenderer Body, Shadow, Shield;
+            public BattleArt.UnitArt Art;
+            /// <summary>Body가 기준이고, 뒷머리·날개·머리는 Body의 자식이라 자세(기울기·찌그러짐)를 같이 따른다.</summary>
+            public SpriteRenderer Body, Back, Wings, Head, Shadow, Shield;
             public SpriteRenderer[] Stars, Bubbles;
             public Vector3 Home, Offset;
             public float Hover, Height, Squash = 1f, Tilt, Fade = 1f, Phase, Flash;
@@ -125,8 +127,8 @@ namespace TinyExpedition.Game.Battle
 
             for (int i = 0; i < Display.Allies.Count; i++)
             {
-                var art = BattleArt.Ally(i < partyIds.Count ? partyIds[i] : Display.Allies[i].Name);
-                var v = MakeUnit(Display.Allies[i], art, 0f, AllySpots[i], false);
+                var art = BattleArt.AllyArt(i < partyIds.Count ? partyIds[i] : Display.Allies[i].Name);
+                var v = MakeUnit(Display.Allies[i], art, AllySpots[i], false);
                 _allies.Add(v);
                 Enter(v, -7f, i * 0.08f);
             }
@@ -228,9 +230,10 @@ namespace TinyExpedition.Game.Battle
             return new Vector3(-a.x, 0, a.z);
         }
 
-        private UnitView MakeUnit(DisplayUnit model, Sprite art, float hover, Vector3 home, bool enemy)
+        private UnitView MakeUnit(DisplayUnit model, BattleArt.UnitArt art, Vector3 home, bool enemy)
         {
-            var v = new UnitView { Model = model, Home = home, Hover = hover, Phase = model.Slot * 1.7f + (enemy ? 0.9f : 0f) };
+            float hover = art.Hover;
+            var v = new UnitView { Model = model, Art = art, Home = home, Hover = hover, Phase = model.Slot * 1.7f + (enemy ? 0.9f : 0f) };
             var root = new GameObject((enemy ? "Enemy_" : "Ally_") + model.Slot);
             root.transform.SetParent(transform, false);
             root.transform.localPosition = home;
@@ -238,12 +241,15 @@ namespace TinyExpedition.Game.Battle
 
             v.Shadow = MakeSprite("Shadow", BattleArt.Shadow(), new Vector3(0, 0.02f, 0), -4500, v.Root);
             v.Shadow.transform.localRotation = Quaternion.Euler(90, 0, 0);
-            float width = art.bounds.size.x;
+            float width = art.Full.bounds.size.x;
             v.Shadow.transform.localScale = new Vector3(width * 0.75f, width * 0.36f, 1f) * (hover > 0 ? 0.7f : 1f);
 
-            v.Body = MakeSprite("Body", art, Vector3.zero, 0, v.Root);
-            v.Body.flipX = enemy; // 적은 왼쪽(아군 쪽)을 본다
-            v.Height = art.bounds.size.y;
+            v.Body = MakeSprite("Body", art.Body, Vector3.zero, 0, v.Root);
+            if (art.Back != null) v.Back = MakeSprite("Back", art.Back, Vector3.zero, 0, v.Body.transform);
+            if (art.Wings != null) v.Wings = MakeSprite("Wings", art.Wings, Vector3.zero, 0, v.Body.transform);
+            if (art.Head != null) v.Head = MakeSprite("Head", art.Head, Vector3.zero, 0, v.Body.transform);
+            foreach (var sr in Layers(v)) sr.flipX = enemy; // 적은 왼쪽(아군 쪽)을 본다
+            v.Height = art.Full.bounds.size.y;
 
             v.Shield = MakeSprite("Fx_Shield", BattleArt.Shield(), Vector3.zero, 0, v.Root);
             v.Stars = Enumerable.Range(0, 3).Select(i => MakeSprite("Fx_Star", BattleArt.Star(), Vector3.zero, 0, v.Root)).ToArray();
@@ -295,6 +301,25 @@ namespace TinyExpedition.Game.Battle
             foreach (var t in new[] { v.NameLabel, v.HpLabel, v.StatusLabel }) t.raycastTarget = false;
         }
 
+        private static IEnumerable<SpriteRenderer> Layers(UnitView v)
+        {
+            if (v.Back != null) yield return v.Back;
+            if (v.Wings != null) yield return v.Wings;
+            yield return v.Body;
+            if (v.Head != null) yield return v.Head;
+        }
+
+        /// <summary>부위 그림을 축(pivot) 둘레로 돌리고 늘린다. 부위 그림은 전부 발밑 가운데가 원점인 같은 크기라 축만 알면 된다.</summary>
+        private static void Pose(SpriteRenderer sr, Vector2 pivot, float angle, Vector2 scale, float lift)
+        {
+            if (sr.flipX) pivot.x = -pivot.x;
+            var rot = Quaternion.Euler(0, 0, angle);
+            var moved = rot * new Vector3(pivot.x * scale.x, pivot.y * scale.y, 0);
+            sr.transform.localRotation = rot;
+            sr.transform.localScale = new Vector3(scale.x, scale.y, 1f);
+            sr.transform.localPosition = new Vector3(pivot.x - moved.x, pivot.y - moved.y + lift, 0);
+        }
+
         private static void Center(RectTransform rt, Vector2 size)
         {
             rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
@@ -327,7 +352,7 @@ namespace TinyExpedition.Game.Battle
             {
                 var m = Display.Enemies[i];
                 var art = BattleArt.Enemy(m.Name);
-                var v = MakeUnit(m, art.Sprite, art.Hover, EnemySpot(i, n), true);
+                var v = MakeUnit(m, art, EnemySpot(i, n), true);
                 _enemies.Add(v);
                 if (animate) Enter(v, 7f, i * 0.1f);
             }
@@ -594,7 +619,7 @@ namespace TinyExpedition.Game.Battle
             // 대상 바로 앞까지 달려간다
             var to = target.Home - actor.Home;
             to.x -= Mathf.Sign(to.x) * 1.15f;
-            to.z -= 0.05f;
+            to.z -= 0.25f; // 대상보다 확실히 앞에 그려지게 (부위 그림이 서로 끼어들지 않도록)
             var from = actor.Offset;
             Run(duration, k => actor.Offset = Vector3.Lerp(from, to, EaseOut(k)) + Vector3.up * Mathf.Sin(k * Mathf.PI) * 0.3f);
             Run(duration + 0.15f, k => actor.Tilt = Mathf.Sin(k * Mathf.PI) * (actor.Home.x < 0 ? -14f : 14f), () => actor.Tilt = 0f);
@@ -767,19 +792,52 @@ namespace TinyExpedition.Game.Battle
                 float cheer = _cheer && m.Side == Side.Ally && m.IsAlive ? Mathf.Abs(Mathf.Sin(_time * 5f + v.Phase)) * 0.35f : 0f;
                 v.Root.localPosition = v.Home + new Vector3(v.Offset.x, 0, v.Offset.z);
                 float bob = v.Hover > 0 ? Mathf.Sin(_time * 2.4f + v.Phase) * 0.12f : 0f;
-                float breathe = 1f + Mathf.Sin(_time * 3f + v.Phase) * 0.025f;
+                bool parts = v.Art.Illustrated;
+                float breathe = 1f + Mathf.Sin(_time * 3f + v.Phase) * (parts ? 0.014f : 0.025f);
 
                 var body = v.Body.transform;
                 body.localPosition = new Vector3(0, v.Hover + bob + v.Offset.y + cheer, 0);
                 body.rotation = face * Quaternion.Euler(0, 0, v.Tilt);
                 body.localScale = new Vector3(2f - v.Squash * breathe, v.Squash * breathe, 1f);
                 int order = Order(v.Root.localPosition.z) + 1000;
-                v.Body.sortingOrder = order;
-                v.Body.enabled = show;
                 var tint = Color.Lerp(Color.white, v.FlashColor, v.Flash * 0.75f);
                 if (m.PoisonStacks > 0 && m.IsAlive) tint = Color.Lerp(tint, Paint.Hex(0xd9b8ff), 0.45f);
                 tint.a = v.Fade;
-                v.Body.color = tint;
+                foreach (var sr in Layers(v))
+                {
+                    sr.enabled = show;
+                    sr.color = tint;
+                }
+                v.Body.sortingOrder = order;
+                if (parts)
+                {
+                    // 파츠 움직임: 머리 까딱임(공격으로 기울 때는 한 박자 더 기운다), 날갯짓, 눈 깜빡임. 연출일 뿐 전투 상태와 무관하다.
+                    float sway = Mathf.Sin(_time * 1.7f + v.Phase) * 2.2f + v.Tilt * 0.25f;
+                    float lift = Mathf.Sin(_time * 3f + v.Phase + 0.6f) * 0.012f;
+                    if (v.Head != null)
+                    {
+                        Pose(v.Head, v.Art.Neck, sway, Vector2.one, lift);
+                        v.Head.sortingOrder = order + 1;
+                    }
+                    if (v.Back != null)
+                    {
+                        Pose(v.Back, v.Art.Neck, sway * 0.6f, Vector2.one, lift);
+                        v.Back.sortingOrder = order - 2;
+                    }
+                    if (v.Wings != null)
+                    {
+                        float flap = (Mathf.Sin(_time * 9f + v.Phase) + 1f) * 0.5f;
+                        Pose(v.Wings, v.Art.Flap, 0f, new Vector2(1f - flap * 0.24f, 1f + flap * 0.07f), 0f);
+                        v.Wings.sortingOrder = order - 1;
+                    }
+                    if (v.Art.Blink != null)
+                    {
+                        bool closed = v.Flash > 0.25f || Mathf.Repeat(_time + v.Phase * 0.77f, 3.4f) < 0.13f;
+                        var eyes = v.Head != null ? v.Head : v.Body;
+                        var want = closed ? v.Art.Blink : v.Head != null ? v.Art.Head : v.Art.Body;
+                        if (eyes.sprite != want) eyes.sprite = want;
+                    }
+                }
                 v.Shadow.enabled = show;
                 v.Shadow.color = new Color(1, 1, 1, v.Fade * 0.8f);
 
@@ -791,7 +849,7 @@ namespace TinyExpedition.Game.Battle
                     v.Shield.transform.localPosition = new Vector3(m.Side == Side.Ally ? 0.55f : -0.55f, v.Hover + v.Height * 0.4f, -0.1f);
                     v.Shield.transform.rotation = face;
                     v.Shield.transform.localScale = Vector3.one * (0.62f + Mathf.Sin(_time * 5f) * 0.03f);
-                    v.Shield.sortingOrder = order + 2;
+                    v.Shield.sortingOrder = order + 3;
                 }
                 for (int i = 0; i < 3; i++)
                 {
@@ -803,7 +861,7 @@ namespace TinyExpedition.Game.Battle
                         star.transform.localPosition = new Vector3(Mathf.Cos(a) * 0.45f, v.Hover + v.Height + 0.05f + Mathf.Sin(a) * 0.1f, 0);
                         star.transform.rotation = face;
                         star.transform.localScale = Vector3.one * 0.42f;
-                        star.sortingOrder = order + (Mathf.Sin(a) > 0 ? -1 : 2);
+                        star.sortingOrder = order + (Mathf.Sin(a) > 0 ? -3 : 3);
                     }
                     var bubble = v.Bubbles[i];
                     bubble.enabled = alive && i < m.PoisonStacks;
@@ -814,7 +872,7 @@ namespace TinyExpedition.Game.Battle
                         bubble.transform.rotation = face;
                         bubble.transform.localScale = Vector3.one * (0.22f + t * 0.14f);
                         bubble.color = new Color(1, 1, 1, 1f - t);
-                        bubble.sortingOrder = order + 2;
+                        bubble.sortingOrder = order + 3;
                     }
                 }
             }
@@ -832,7 +890,7 @@ namespace TinyExpedition.Game.Battle
             if (!mark.enabled) return;
             mark.transform.localPosition = v.Home + new Vector3(0, 0.03f, 0);
             mark.transform.localRotation = Quaternion.Euler(90, _time * 60f, 0);
-            float w = v.Body.sprite.bounds.size.x * 0.85f * scale * (1f + Mathf.Sin(_time * 4f) * 0.04f);
+            float w = v.Art.Full.bounds.size.x * 0.85f * scale * (1f + Mathf.Sin(_time * 4f) * 0.04f);
             mark.transform.localScale = new Vector3(w, w * 0.9f, 1f);
         }
 
@@ -874,6 +932,20 @@ namespace TinyExpedition.Game.Battle
         {
             var v = View(side, slot);
             return v == null || v.HpLabel == null ? null : v.HpLabel.text;
+        }
+
+        /// <summary>그 유닛이 일러스트(부위별 그림)로 서 있는지. false면 그림 파일이 없어 기본 그림으로 대신한 것이다.</summary>
+        public bool IsIllustrated(Side side, int slot)
+        {
+            var v = View(side, slot);
+            return v != null && v.Art.Illustrated;
+        }
+
+        /// <summary>그 유닛을 그리는 부위 수 (기본 그림은 1).</summary>
+        public int LayerCount(Side side, int slot)
+        {
+            var v = View(side, slot);
+            return v == null ? 0 : Layers(v).Count();
         }
 
         /// <summary>그 유닛의 그림이 화면에 서 있는지 (쓰러져 사라졌으면 false).</summary>
