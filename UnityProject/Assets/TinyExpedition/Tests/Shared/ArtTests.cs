@@ -29,6 +29,11 @@ namespace TinyExpedition.Tests
         private static string SkinDir => Path.Combine(StreamingAssets, "Skins");
         /// <summary>SVG 원본 폴더 (저장소 루트의 art/units).</summary>
         private static string SourceDir => Path.GetFullPath(Path.Combine(StreamingAssets, "..", "..", "..", "art", "units"));
+        /// <summary>무대 소품 SVG 원본 폴더 (art/props).</summary>
+        private static string PropSourceDir => Path.GetFullPath(Path.Combine(StreamingAssets, "..", "..", "..", "art", "props"));
+
+        /// <summary>홈 로비가 세우는 소품과, 따로 움직이는 부위(불꽃 = head)가 꼭 있어야 하는 것.</summary>
+        public static readonly (string Key, bool NeedsHead)[] LobbyProps = { ("p_tent", false), ("p_signpost", false), ("p_campfire", true) };
 
         private static Dictionary<string, Unit> Manifest()
         {
@@ -112,7 +117,9 @@ namespace TinyExpedition.Tests
             var manifest = Manifest();
             Assert.That(Directory.Exists(SourceDir), Is.True, "SVG 원본 폴더가 없습니다: " + SourceDir);
             var problems = new List<string>();
-            var sources = Directory.GetFiles(SourceDir, "*.svg").ToDictionary(Path.GetFileNameWithoutExtension);
+            var sources = Directory.GetFiles(SourceDir, "*.svg")
+                .Concat(Directory.Exists(PropSourceDir) ? Directory.GetFiles(PropSourceDir, "*.svg") : new string[0])
+                .ToDictionary(Path.GetFileNameWithoutExtension);
             foreach (var src in sources)
             {
                 if (!manifest.TryGetValue(src.Key, out var unit)) { problems.Add(src.Key + ": SVG는 있는데 PNG를 만들지 않음"); continue; }
@@ -136,6 +143,21 @@ namespace TinyExpedition.Tests
             {
                 var sizes = unit.Files.Select(f => Path.Combine(ArtDir, unit.Key + "." + f + ".png")).Where(File.Exists).Select(PngSize).Distinct().ToList();
                 if (sizes.Count != 1) problems.Add(unit.Key + ": 부위 그림 크기가 서로 다름 " + string.Join(", ", sizes));
+            }
+            Assert.That(problems, Is.Empty, string.Join("\n", problems));
+        }
+
+        [Test, TC("ART-008")]
+        public void LobbyProps_HaveArt()
+        {
+            var manifest = Manifest();
+            var problems = new List<string>();
+            foreach (var (key, needsHead) in LobbyProps)
+            {
+                if (!manifest.TryGetValue(key, out var unit)) { problems.Add(key + ": 소품 그림 없음 (art/props에서 pnpm render)"); continue; }
+                problems.AddRange(MissingFiles(unit).Select(f => key + ": " + f + " 없음"));
+                if (needsHead && !unit.Layers.Contains("head")) problems.Add(key + ": 따로 움직일 부위(head)가 없음");
+                if (!File.Exists(Path.Combine(PropSourceDir, key + ".svg"))) problems.Add(key + ": SVG 원본이 art/props에 없음");
             }
             Assert.That(problems, Is.Empty, string.Join("\n", problems));
         }

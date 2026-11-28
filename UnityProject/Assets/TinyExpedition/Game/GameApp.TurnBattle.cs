@@ -94,6 +94,9 @@ namespace TinyExpedition.Game
         {
             if (_stage != null) Destroy(_stage.gameObject);
             _stage = null;
+            // 홈 로비 무대도 같이 치운다 (화면마다 3D 무대는 하나만)
+            if (_lobby != null) Destroy(_lobby.gameObject);
+            _lobby = null;
             _resultDelay = -1f;
         }
 

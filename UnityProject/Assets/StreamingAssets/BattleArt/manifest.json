@@ -276,6 +276,58 @@
         "x": 0,
         "y": 0
       }
+    },
+    {
+      "key": "p_campfire",
+      "hash": "41af6054365e5c3a",
+      "ppu": 200,
+      "layers": [
+        "body",
+        "head"
+      ],
+      "blink": "",
+      "neck": {
+        "x": 0,
+        "y": 0.44
+      },
+      "flap": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "key": "p_signpost",
+      "hash": "1a6a2822eb8ee619",
+      "ppu": 200,
+      "layers": [
+        "body"
+      ],
+      "blink": "",
+      "neck": {
+        "x": 0,
+        "y": 0
+      },
+      "flap": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "key": "p_tent",
+      "hash": "6ea135b5dd36b8e0",
+      "ppu": 200,
+      "layers": [
+        "body"
+      ],
+      "blink": "",
+      "neck": {
+        "x": 0,
+        "y": 0
+      },
+      "flap": {
+        "x": 0,
+        "y": 0
+      }
     }
   ]
 }

@@ -1,4 +1,4 @@
-// 전투 캐릭터 SVG(art/units/*.svg) → 부위별 PNG + manifest.json
+// 전투 캐릭터 SVG(art/units/*.svg)·무대 소품 SVG(art/props/*.svg) → 부위별 PNG + manifest.json
 //   node render.mjs           PNG와 manifest를 다시 만든다
 //   node render.mjs --check   SVG가 바뀌었는데 PNG를 다시 만들지 않았으면 실패 (manifest의 해시와 비교)
 //
@@ -10,11 +10,11 @@
 import { Resvg } from '@resvg/resvg-js';
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const srcDir = join(here, 'units');
+const srcDirs = [join(here, 'units'), join(here, 'props')];
 const outDir = join(here, '..', 'UnityProject', 'Assets', 'StreamingAssets', 'BattleArt');
 const skinDir = join(here, '..', 'UnityProject', 'Assets', 'StreamingAssets', 'Skins');
 const manifestPath = join(outDir, 'manifest.json');
@@ -24,8 +24,9 @@ const LAYERS = ['back', 'wings', 'body', 'head'];
 const sha = text => createHash('sha256').update(text.replace(/\r\n/g, '\n')).digest('hex').slice(0, 16);
 const attr = (svg, name) => (svg.match(new RegExp(`<svg[^>]*[ ]${name}="([^"]*)"`)) || [])[1];
 
-function describe(file) {
-  const svg = readFileSync(join(srcDir, file), 'utf8');
+function describe(path) {
+  const svg = readFileSync(path, 'utf8');
+  const file = basename(path);
   const key = file.replace(/\.svg$/, '');
   const [, , w, h] = attr(svg, 'viewBox').split(/\s+/).map(Number);
   const ppu = Number(attr(svg, 'data-ppu'));
@@ -85,7 +86,9 @@ function cardSvg(u) {
 </svg>`;
 }
 
-const files = readdirSync(srcDir).filter(f => f.endsWith('.svg')).sort();
+// 소품(p_*)은 캐릭터와 같은 규칙(L-body 필수, L-head는 따로 움직일 부분)을 따르고 모집 카드는 만들지 않는다
+const files = srcDirs.filter(existsSync).flatMap(d => readdirSync(d).filter(f => f.endsWith('.svg')).map(f => join(d, f)))
+  .sort((a, b) => basename(a).localeCompare(basename(b)));
 const units = files.map(describe);
 const manifest = { version: 1, units: units.map(u => u.entry) };
 

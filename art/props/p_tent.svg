@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 300" data-ppu="100" stroke-linejoin="round" stroke-linecap="round">
+  <!-- 원정대 천막: 크림색 천에 하늘색 줄무늬, 열린 입구 안쪽은 따뜻한 등불 빛, 꼭대기에 작은 삼각 깃발 -->
+  <defs>
+    <linearGradient id="clothG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6e2"/><stop offset="1" stop-color="#f0dcb4"/></linearGradient>
+    <linearGradient id="insideG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a4a3a"/><stop offset=".7" stop-color="#c9804a"/><stop offset="1" stop-color="#ffcf7a"/></linearGradient>
+    <path id="tent" d="M180 46 C150 98 92 190 30 268 C28 274 32 280 40 280 L320 280 C328 280 332 274 330 268 C268 190 210 98 180 46 Z"/>
+    <clipPath id="c-tent"><use href="#tent"/></clipPath>
+  </defs>
+  <g id="L-body">
+    <!-- 바닥 말뚝과 줄 -->
+    <path d="M30 268 L6 290 M330 268 L354 290" fill="none" stroke="#8a6a4a" stroke-width="3"/>
+    <path d="M2 292 l8 -10 M350 282 l8 10" fill="none" stroke="#6a4a2e" stroke-width="5"/>
+    <!-- 천 -->
+    <use href="#tent" fill="url(#clothG)"/>
+    <g clip-path="url(#c-tent)">
+      <path d="M180 40 L96 300 H128 L180 60 Z M180 40 L264 300 H232 L180 60 Z" fill="#8cc8f0" opacity=".75"/>
+      <path d="M180 40 L20 300 H40 L180 52 Z" fill="#fff" opacity=".35"/>
+      <path d="M180 46 L340 300 H220 Z" fill="#c9a878" opacity=".35"/>
+      <!-- 입구 -->
+      <path d="M180 140 C166 190 150 236 136 282 L224 282 C210 236 194 190 180 140 Z" fill="url(#insideG)"/>
+      <ellipse cx="180" cy="262" rx="30" ry="16" fill="#ffe7a0" opacity=".7"/>
+      <path d="M180 140 C170 190 150 240 128 282 L150 282 C160 236 172 190 180 140 Z" fill="#f0dcb4" stroke="#8a6a4a" stroke-width="3"/>
+      <path d="M180 140 C190 190 210 240 232 282 L210 282 C200 236 188 190 180 140 Z" fill="#e6cfa2" stroke="#8a6a4a" stroke-width="3"/>
+      <path d="M40 270 C120 262 240 262 320 270 V290 H40Z" fill="#b8956a" opacity=".45"/>
+    </g>
+    <use href="#tent" fill="none" stroke="#6a4a2e" stroke-width="5"/>
+    <!-- 기둥과 깃발 -->
+    <path d="M180 48 V8" fill="none" stroke="#6a4a2e" stroke-width="5"/>
+    <path d="M182 10 L224 20 L182 32 Z" fill="#ff8f8f" stroke="#a84a4a" stroke-width="3"/>
+    <circle cx="180" cy="8" r="5" fill="#ffd23f" stroke="#a8781e" stroke-width="2.5"/>
+    <!-- 덧댄 천 조각 -->
+    <rect x="252" y="210" width="26" height="22" rx="3" fill="#ffd2a0" stroke="#8a6a4a" stroke-width="2.6" transform="rotate(-12 265 221)"/>
+    <path d="M256 214 l4 4 M270 212 l-2 6" fill="none" stroke="#8a6a4a" stroke-width="2"/>
+  </g>
+</svg>
