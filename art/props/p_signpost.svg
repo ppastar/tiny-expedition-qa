@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 300" data-ppu="100" stroke-linejoin="round" stroke-linecap="round">
+  <!-- 갈림길 표지판: 나무 기둥에 화살표 판 두 장, 옆에 매단 등불 하나 -->
+  <defs>
+    <linearGradient id="woodG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8a86a"/><stop offset="1" stop-color="#b07e48"/></linearGradient>
+    <radialGradient id="lampG"><stop offset="0" stop-color="#fff6c0"/><stop offset=".5" stop-color="#ffd25a" stop-opacity=".6"/><stop offset="1" stop-color="#ffd25a" stop-opacity="0"/></radialGradient>
+  </defs>
+  <g id="L-body">
+    <ellipse cx="110" cy="290" rx="44" ry="9" fill="#5a7a4a" opacity=".45"/>
+    <!-- 풀 -->
+    <path d="M78 292 C76 276 70 268 62 262 C74 266 82 274 86 288 M140 292 C144 278 152 270 160 266 C150 272 146 282 144 292" fill="#7fcf6a" stroke="#3f6a2a" stroke-width="3"/>
+    <!-- 기둥 -->
+    <path d="M98 292 L102 40 C102 32 118 32 118 40 L122 292 Z" fill="url(#woodG)" stroke="#5a3a20" stroke-width="5"/>
+    <path d="M106 60 V280" fill="none" stroke="#f0c88a" stroke-width="3" opacity=".7"/>
+    <path d="M114 120 l-4 10 M112 200 l-3 8" fill="none" stroke="#7a5230" stroke-width="2.4"/>
+    <!-- 위 화살표 판 (오른쪽) -->
+    <path d="M60 52 H176 L206 78 L176 104 H60 C54 104 50 100 50 94 V62 C50 56 54 52 60 52 Z" fill="url(#woodG)" stroke="#5a3a20" stroke-width="5"/>
+    <path d="M70 70 H150 M70 86 H134" fill="none" stroke="#7a5230" stroke-width="5"/>
+    <circle cx="110" cy="78" r="5" fill="#8a8f9a" stroke="#4c5468" stroke-width="2"/>
+    <!-- 아래 화살표 판 (왼쪽) -->
+    <path d="M160 116 H52 L22 140 L52 164 H160 C166 164 170 160 170 154 V126 C170 120 166 116 160 116 Z" fill="#e8b878" stroke="#5a3a20" stroke-width="5"/>
+    <path d="M66 132 H150 M84 148 H150" fill="none" stroke="#9a6a3a" stroke-width="5"/>
+    <circle cx="110" cy="140" r="5" fill="#8a8f9a" stroke="#4c5468" stroke-width="2"/>
+    <!-- 등불 -->
+    <path d="M118 182 H146 V192" fill="none" stroke="#5a3a20" stroke-width="4"/>
+    <circle cx="146" cy="222" r="34" fill="url(#lampG)"/>
+    <path d="M134 196 H158 L162 204 H130 Z" fill="#5a6278" stroke="#2b2238" stroke-width="3"/>
+    <rect x="132" y="204" width="28" height="34" rx="6" fill="#ffe27a" stroke="#2b2238" stroke-width="3.6"/>
+    <path d="M146 206 V236 M134 220 H158" fill="none" stroke="#5a6278" stroke-width="2.4"/>
+    <path d="M132 238 H160 L156 246 H136 Z" fill="#5a6278" stroke="#2b2238" stroke-width="3"/>
+  </g>
+</svg>

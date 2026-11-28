@@ -218,6 +218,15 @@ namespace TinyExpedition.Game.Battle
         /// <summary>아군 전신 그림 한 장 (초상화용). 발이 아래쪽 가운데(피벗).</summary>
         public static Sprite Ally(string characterId) => AllyArt(characterId).Full;
 
+        /// <summary>무대 소품 그림 (art/props의 p_*). 파일이 없으면 둥근 덩어리로 대신한다.</summary>
+        public static UnitArt PropArt(string key) => ArtFor(key, 0f, () => Get("propfallback:" + key, () =>
+        {
+            var p = new Paint(128, 128);
+            p.Ellipse(64, 40, 54, 36, Paint.Hex(0xc9a878));
+            p.Outline(3, Ink);
+            return p.ToSprite(64);
+        }));
+
         private static Sprite AllyFallback(string characterId) => Get("ally:" + characterId, () =>
         {
             var p = new Paint(288, 352);
@@ -665,14 +674,19 @@ namespace TinyExpedition.Game.Battle
             public Color SkyTop, SkyBottom, Far, Mid, GroundA, GroundB, Haze, Glow;
         }
 
+        /// <summary>홈 로비 무대의 테마 id.</summary>
+        public const string LobbyTheme = "lobby";
+
         /// <summary>스테이지마다 색만 다른 같은 무대. 스테이지 id로 고른다.</summary>
         public static Theme ThemeFor(string stageId)
         {
-            int theme = stageId == "T-1" ? 0 : stageId == "T-2" ? 1 : stageId == "T-3" ? 2 : (int)(Hash(stageId) % 3);
+            int theme = stageId == "T-1" ? 0 : stageId == "T-2" ? 1 : stageId == "T-3" ? 2 : stageId == LobbyTheme ? 3 : (int)(Hash(stageId) % 3);
             switch (theme)
             {
                 case 1: // 독버섯 늪: 연두·노랑
                     return new Theme { SkyTop = Paint.Hex(0x7fd6c2), SkyBottom = Paint.Hex(0xf6f3b0), Far = Paint.Hex(0x7cc7a0), Mid = Paint.Hex(0x4f9f7a), GroundA = Paint.Hex(0x9bd66a), GroundB = Paint.Hex(0x86c85c), Haze = Paint.Hex(0xe9f7c0), Glow = Paint.Hex(0xfff3a0) };
+                case 3: // 홈 로비(원정대 야영지): 해 질 녘 라벤더·복숭아빛
+                    return new Theme { SkyTop = Paint.Hex(0x8f8ae0), SkyBottom = Paint.Hex(0xffd9c0), Far = Paint.Hex(0xb49ad8), Mid = Paint.Hex(0x7d6fc0), GroundA = Paint.Hex(0xa8dca0), GroundB = Paint.Hex(0x96d090), Haze = Paint.Hex(0xffe8dc), Glow = Paint.Hex(0xffe9a0) };
                 case 2: // 뿌리 깊은 굴: 살구·주황
                     return new Theme { SkyTop = Paint.Hex(0xffb38a), SkyBottom = Paint.Hex(0xffe9c0), Far = Paint.Hex(0xe59a78), Mid = Paint.Hex(0xb86f5a), GroundA = Paint.Hex(0xe8c88a), GroundB = Paint.Hex(0xdcb878), Haze = Paint.Hex(0xfff0d0), Glow = Paint.Hex(0xfff0b0) };
                 default: // 반딧불 동굴: 하늘·민트

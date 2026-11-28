@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 240" data-ppu="100" data-neck="110 196" stroke-linejoin="round" stroke-linecap="round">
+  <!-- 모닥불: 둥근 돌 테두리와 엇갈린 장작(몸), 세 겹 불꽃(머리 자리 — 게임에서 일렁이게 늘였다 줄인다) -->
+  <defs>
+    <linearGradient id="logG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b07a4a"/><stop offset="1" stop-color="#7a4e2c"/></linearGradient>
+    <linearGradient id="flameG" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff7a3a"/><stop offset=".6" stop-color="#ffb347"/><stop offset="1" stop-color="#ffe27a"/></linearGradient>
+    <radialGradient id="emberG"><stop offset="0" stop-color="#fff0a0"/><stop offset="1" stop-color="#ff9a4a" stop-opacity="0"/></radialGradient>
+  </defs>
+  <g id="L-body">
+    <ellipse cx="110" cy="214" rx="88" ry="22" fill="url(#emberG)" opacity=".8"/>
+    <!-- 뒤쪽 돌 -->
+    <g fill="#a9b0c0" stroke="#4c5468" stroke-width="4">
+      <ellipse cx="56" cy="204" rx="22" ry="14"/><ellipse cx="96" cy="198" rx="20" ry="12"/><ellipse cx="136" cy="198" rx="20" ry="12"/><ellipse cx="168" cy="206" rx="20" ry="13"/>
+    </g>
+    <!-- 장작 -->
+    <g stroke="#4a2e18" stroke-width="5">
+      <path d="M40 222 L170 176 C178 174 184 184 178 190 L52 236 C44 238 36 228 40 222 Z" fill="url(#logG)"/>
+      <path d="M180 222 L50 176 C42 174 36 184 42 190 L168 236 C176 238 184 228 180 222 Z" fill="url(#logG)"/>
+    </g>
+    <ellipse cx="174" cy="183" rx="7" ry="8" fill="#e8c088" stroke="#4a2e18" stroke-width="3"/>
+    <ellipse cx="46" cy="183" rx="7" ry="8" fill="#e8c088" stroke="#4a2e18" stroke-width="3"/>
+    <path d="M80 210 l30 -10 M120 204 l26 8" fill="none" stroke="#5a3a20" stroke-width="2.4"/>
+    <!-- 앞쪽 돌 -->
+    <g fill="#c3cad6" stroke="#4c5468" stroke-width="4">
+      <ellipse cx="40" cy="222" rx="22" ry="14"/><ellipse cx="82" cy="230" rx="24" ry="13"/><ellipse cx="128" cy="230" rx="24" ry="13"/><ellipse cx="176" cy="222" rx="22" ry="14"/>
+    </g>
+    <path d="M30 216 q8 -6 18 -4 M74 224 q8 -5 18 -3 M120 224 q8 -5 18 -3 M168 216 q8 -6 18 -4" fill="none" stroke="#fff" stroke-width="3" opacity=".6"/>
+  </g>
+  <g id="L-head">
+    <path d="M110 18 C130 60 168 92 162 146 C158 180 136 200 110 200 C84 200 60 182 58 150 C56 118 78 108 84 80 C94 98 96 110 104 116 C104 84 96 56 110 18 Z" fill="url(#flameG)" stroke="#d2502a" stroke-width="4.6"/>
+    <path d="M112 84 C126 110 142 128 138 156 C136 178 124 190 110 190 C94 190 82 178 82 160 C82 140 96 132 98 116 C104 128 106 134 110 136 C112 118 106 102 112 84 Z" fill="#ffd25a"/>
+    <path d="M110 136 C118 150 126 160 124 174 C122 184 116 188 110 188 C102 188 96 182 96 172 C96 160 104 154 110 136 Z" fill="#fff6c8"/>
+    <path d="M148 60 c4 -6 10 -6 12 0 M64 76 c3 -5 8 -5 10 0" fill="none" stroke="#ffb347" stroke-width="3"/>
+    <circle cx="150" cy="40" r="4" fill="#ffd25a"/><circle cx="72" cy="56" r="3" fill="#ffd25a"/>
+  </g>
+</svg>

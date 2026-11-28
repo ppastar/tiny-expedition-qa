@@ -5,18 +5,18 @@
 수집형 턴제 RPG를 작게 직접 만들고(Unity 6), 그 게임을 대상으로 **TC 설계 → 자동화 테스트 → QA 도구 → 버그 리포트 → CI**를 한 흐름으로 구현한 프로젝트입니다.
 QA로 일을 시작해 SDET로 넘어온 경험을, "수집형 RPG를 출시·운영할 때 QA가 실제로 걱정하는 것"에 맞춰 옮겼습니다.
 
-![2.5D 턴제 전투 — 실제 빌드가 스스로 플레이하며 찍은 화면](docs/reports/autoplay/10-turn-battle-attack.png)
+![2.5D 턴제 전투 — 실제 빌드가 스스로 플레이하며 찍은 화면](docs/reports/autoplay/11-turn-battle-attack.png)
 
 | | 결과 | 근거 |
 |---|---|---|
-| TC 문서 | 106개 (자동화 103 · 수동 3) | [`docs/test-cases.csv`](docs/test-cases.csv) |
-| 자동화 TC 통과 | **103 / 103** | [TC 추적 리포트](docs/reports/test-report.html) — 문서 ↔ 테스트 ↔ 결과를 TC 번호로 대조 |
-| 자동화 테스트 | 규칙·리소스 112 · QA 도구 23 · 화면(Unity PlayMode) 11 | 112개는 dotnet과 Unity에서 같은 소스로 실행 |
+| TC 문서 | 111개 (자동화 108 · 수동 3) | [`docs/test-cases.csv`](docs/test-cases.csv) |
+| 자동화 TC 통과 | **108 / 108** | [TC 추적 리포트](docs/reports/test-report.html) — 문서 ↔ 테스트 ↔ 결과를 TC 번호로 대조 |
+| 자동화 테스트 | 규칙·리소스 113 · QA 도구 23 · 화면(Unity PlayMode) 15 | 113개는 dotnet과 Unity에서 같은 소스로 실행 |
 | 뮤테이션 스모크 | **40 / 40** 검출 | 그럴듯한 버그 40개를 코드에 넣어 테스트가 잡는지 확인 |
 | 모집 확률 검증 | 배너당 100만 회, 전부 통과 | [확률 검증 리포트](docs/reports/gacha-report.md) |
 | 실제로 찾은 결함 | 3건 (모두 수정 · 회귀 TC 있음) | [버그 리포트](docs/bug-reports/README.md) |
 
-> 게임의 캐릭터·이름·그림·규칙 수치는 모두 이 프로젝트용으로 새로 만든 것이며, 특정 게임을 복제한 것이 아닙니다. 캐릭터 그림은 이 프로젝트에서 직접 그린 SVG 일러스트이고, 외부 에셋은 쓰지 않았습니다([출처](docs/ART.md)).
+> 게임의 캐릭터·이름·그림·규칙 수치는 모두 이 프로젝트용으로 새로 만든 것이며, 특정 게임을 복제한 것이 아닙니다. 캐릭터·홈 로비 소품 그림은 이 프로젝트에서 직접 그린 SVG 일러스트이고, 외부 에셋은 쓰지 않았습니다([출처](docs/ART.md)).
 
 ## 턴제 전투 QA에서 본 것
 
@@ -48,7 +48,7 @@ QA로 일을 시작해 SDET로 넘어온 경험을, "수집형 RPG를 출시·�
 
 | 문서 | 내용 |
 |---|---|
-| [TC 문서](docs/test-cases.csv) | 106개. 영역 · 우선순위(P0 48 · P1 44 · P2 14) · 유형 · 실행 환경 |
+| [TC 문서](docs/test-cases.csv) | 111개. 영역 · 우선순위(P0 49 · P1 48 · P2 14) · 유형 · 실행 환경 |
 | [테스트 계획](docs/TEST_PLAN.md) | 위험별 대응, TC 작성 기준, 통계 판정 기준, 릴리스 기준, [개발 단계별 계획](docs/TEST_PLAN.md#7-개발-단계별-테스트-계획) |
 | [버그 리포트](docs/bug-reports/README.md) | Jira 양식. 실제 결함 3건 + 시연용 3건, 시드·리플레이로 재현한 출력 첨부 |
 | [기획 리뷰 (모집·천장)](docs/spec-review/gacha.md) | 규칙 11개 정리, 질문 13개 · 리스크 · TC 연결. 사후 작성임을 문서에 밝힘 |
@@ -85,7 +85,7 @@ Claude Code(AI 코딩 도구)와 함께 만들었고, 커밋의 `Co-Authored-By:
 ## 현재 상태와 한계
 
 - 알려진 열린 결함 없음.
-- CI(GitHub Actions, Ubuntu)는 Unity 없이 도는 부분(규칙·리소스 112 · QA 도구 23 · 데이터 검사 · 확률 검증 · 추적 리포트 · 뮤테이션)만 돌립니다. Unity EditMode · PlayMode 테스트와 빌드 자동 플레이는 라이선스가 필요해 로컬(Windows, Unity 6000.5.6f1)에서 돌린 결과입니다.
+- CI(GitHub Actions, Ubuntu)는 Unity 없이 도는 부분(규칙·리소스 113 · QA 도구 23 · 데이터 검사 · 확률 검증 · 추적 리포트 · 뮤테이션)만 돌립니다. Unity EditMode · PlayMode 테스트와 빌드 자동 플레이는 라이선스가 필요해 로컬(Windows, Unity 6000.5.6f1)에서 돌린 결과입니다.
 - 수동 TC 3개(실기기 터치 지연, 화면 비율, 턴제 템포·가독성)는 사람이 봐야 하는 항목으로 남겨 두었습니다.
 - 서버 · 결제 · 네트워크는 범위 밖입니다(오프라인 게임). 성능은 전투 화면 프레임 시간만 자동 플레이가 기록합니다(1280×720 개발 빌드, 개발 PC 한 대 기준 평균 8.5ms · 최대 58ms).
 - 실행 대상은 Windows · 에디터입니다. Android · WebGL은 데이터 읽기(`UnityWebRequest`)와 한글 폰트 포함을 바꿔야 합니다.

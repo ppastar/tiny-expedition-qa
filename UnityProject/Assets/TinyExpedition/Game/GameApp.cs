@@ -8,6 +8,7 @@ using TinyExpedition.Core.Data;
 using TinyExpedition.Core.Gacha;
 using TinyExpedition.Core.MiniGame;
 using TinyExpedition.Core.Progress;
+using TinyExpedition.Game.Battle;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -145,26 +146,71 @@ namespace TinyExpedition.Game
             if (_gemsLabel != null) _gemsLabel.text = "보석 " + Session.State.Gems.ToString("N0", System.Globalization.CultureInfo.InvariantCulture);
         }
 
+        /// <summary>홈의 2.5D 로비 무대. 홈이 아니면 null.</summary>
+        public LobbyStage Lobby => _lobby;
+        private LobbyStage _lobby;
+
+        /// <summary>
+        /// 홈: 전투와 같은 2.5D 무대(원정대 야영지)에 파티가 서 있고, 모집은 오른쪽 패널, 나머지 메뉴는 아래 줄.
+        /// 무대에 서는 캐릭터는 원정 자동 편성(AutoParty)과 같다. 보유 캐릭터가 없으면 픽업 캐릭터를 대신 세운다.
+        /// </summary>
         public void ShowHome()
         {
-            var col = BeginScreen("Home");
+            UiKit.Clear(_root);
+            DestroyBattleStage();
+            _root.GetComponent<Image>().enabled = false; // 뒤의 3D 무대가 보이게
+            CurrentScreen = "Home";
             var banner = Session.Db.GetBanner(MainBannerId);
             Session.State.Pity.TryGetValue(banner.Id, out var pity);
-            UiKit.Label("Label_Banner", col, banner.Name, 64, UiKit.TextColor, TextAnchor.MiddleCenter, 120);
-            UiKit.Label("Label_Pity", col, "천장까지 " + (banner.HardPity - (pity?.PullsSinceThreeStar ?? 0)) + "회", 36, UiKit.Muted);
-            // 가로 화면: 버튼을 두 개씩 나란히
-            var pulls = UiKit.Row("Row_Pull", col, 16, 120);
-            UiKit.Button("Btn_Pull1", pulls, "1회 모집 (" + banner.CostPerPull + ")", () => DoPull(1));
-            UiKit.Button("Btn_Pull10", pulls, "10회 모집 (" + banner.CostPerPull * 10 + ")", () => DoPull(10));
-            var modes = UiKit.Row("Row_Modes", col, 16, 120);
-            UiKit.Button("Btn_Stages", modes, "원정 떠나기", ShowStages, UiKit.Panel);
-            UiKit.Button("Btn_TurnBattle", modes, "턴제 전투: 동굴 탐험", ShowTurnStages, UiKit.Panel);
-            var etc = UiKit.Row("Row_Etc", col, 16, 120);
-            UiKit.Button("Btn_MiniGame", etc, "미니게임: 별빛 타이밍", ShowMiniGame, UiKit.Panel);
-            UiKit.Button("Btn_Roster", etc, "보유 캐릭터 (" + Session.State.Owned.Count + ")", ShowRoster, UiKit.Panel);
+
+            var unitLayer = Layer("LobbyUnits", _root);
+            _lobby = LobbyStage.Create(transform, AutoParty(), banner.PickupId ?? Session.Db.Characters.First().Id, unitLayer,
+                id => Session.Db.GetCharacter(id).Name);
+
+            var hud = Layer("Screen_Home", _root);
+            var dark = new Color(0.09f, 0.09f, 0.18f, 0.72f);
+
+            // 위: 게임 이름(왼쪽) · 보석(오른쪽)
+            var title = Pill("TitlePanel", hud, dark);
+            Place(title, new Vector2(0, 1), new Vector2(28, -22), new Vector2(340, 72));
+            UiKit.Stretch(UiKit.Label("Label_Title", title, "작은 원정대", 38, UiKit.TextColor).rectTransform);
+            var gems = Pill("GemsPanel", hud, dark);
+            Place(gems, new Vector2(1, 1), new Vector2(-28, -22), new Vector2(340, 72));
+            _gemsLabel = UiKit.Label("Label_Gems", gems, "", 38, UiKit.Gold);
+            UiKit.Stretch(_gemsLabel.rectTransform);
+            RefreshGems();
+
+            // 오른쪽: 모집 패널
+            var panel = Pill("BannerPanel", hud, new Color(0.11f, 0.1f, 0.22f, 0.84f));
+            Place(panel, new Vector2(1, 0.5f), new Vector2(-40, 40), new Vector2(620, 520));
+            var col = UiKit.Column("BannerColumn", panel, 14, 30);
+            UiKit.Label("Label_BannerTag", col, "픽업 모집", 28, UiKit.Gold);
+            UiKit.Label("Label_Banner", col, banner.Name, 54, UiKit.TextColor, TextAnchor.MiddleCenter, 84);
+            UiKit.Label("Label_Pity", col, "천장까지 " + (banner.HardPity - (pity?.PullsSinceThreeStar ?? 0)) + "회", 32, UiKit.Muted);
+            UiKit.Button("Btn_Pull1", col, "1회 모집 (" + banner.CostPerPull + ")", () => DoPull(1), UiKit.Accent, 104);
+            UiKit.Button("Btn_Pull10", col, "10회 모집 (" + banner.CostPerPull * 10 + ")", () => DoPull(10), UiKit.Accent, 104);
+
+            // 아래: 다른 메뉴
+            var bottom = Layer("MenuBar", hud);
+            Place(bottom, new Vector2(0.5f, 0), new Vector2(0, 26), new Vector2(1860, 112));
+            var row = bottom.gameObject.AddComponent<HorizontalLayoutGroup>();
+            row.spacing = 14;
+            row.childControlWidth = row.childControlHeight = true;
+            row.childForceExpandWidth = row.childForceExpandHeight = true;
+            var menu = new Color(0.13f, 0.14f, 0.26f, 0.9f);
+            MenuButton("Btn_Stages", bottom, "원정 떠나기", ShowStages, menu);
+            MenuButton("Btn_TurnBattle", bottom, "턴제 전투: 동굴 탐험", ShowTurnStages, menu);
+            MenuButton("Btn_MiniGame", bottom, "미니게임: 별빛 타이밍", ShowMiniGame, menu);
+            MenuButton("Btn_Roster", bottom, "보유 캐릭터 (" + Session.State.Owned.Count + ")", ShowRoster, menu);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            UiKit.Button("Btn_Debug", col, "QA 디버그 패널", ShowDebug, new Color(0.35f, 0.2f, 0.2f), 84);
+            MenuButton("Btn_Debug", bottom, "QA 디버그", ShowDebug, new Color(0.42f, 0.2f, 0.24f, 0.9f));
 #endif
+        }
+
+        private static void MenuButton(string name, Transform parent, string text, UnityEngine.Events.UnityAction onClick, Color color)
+        {
+            var b = UiKit.Button(name, parent, text, onClick, color, 112);
+            b.GetComponentInChildren<Text>().fontSize = 34;
         }
 
         private void DoPull(int count)
@@ -245,6 +291,9 @@ namespace TinyExpedition.Game
             }
             UiKit.Button("Btn_Back", col, "돌아가기", ShowHome, UiKit.Panel);
         }
+
+        /// <summary>원정·턴제·홈 로비가 쓰는 자동 편성 (테스트가 로비 무대와 비교한다).</summary>
+        public IReadOnlyList<string> AutoPartyIds() => AutoParty();
 
         /// <summary>보유 캐릭터 중 공격력 높은 순 3명.</summary>
         private List<string> AutoParty() =>

@@ -10,7 +10,7 @@ namespace TinyExpedition.Game
     /// <summary>
     /// 개발 빌드 전용 자동 플레이(빌드 스모크 테스트).
     /// 실행: TinyExpedition.exe -qaAutoplay &lt;결과 폴더&gt;
-    /// 홈 → 10연 모집 → 보유 캐릭터 → 원정 1-1 전투 → 미니게임 한 판 → 턴제 T-1 전투(2.5D 무대)를 실제 빌드에서 진행하고
+    /// 홈(2.5D 로비) → 10연 모집 → 로비 파티·탭 반응 → 보유 캐릭터 → 원정 1-1 전투 → 미니게임 한 판 → 턴제 T-1 전투(2.5D 무대)를 실제 빌드에서 진행하고
     /// 단계마다 스크린샷을 남긴 뒤 종료한다. 실패하면 종료 코드 1.
     /// 출시 빌드에는 컴파일되지 않는다.
     /// </summary>
@@ -68,6 +68,7 @@ namespace TinyExpedition.Game
         {
             yield return Wait(1.0f);
             Expect(_app.CurrentScreen == "Home", "홈 화면");
+            Expect(_app.Lobby != null && !_app.Lobby.Cam.orthographic && _app.Lobby.IsShowcase, "홈 2.5D 로비 (보유 캐릭터 없음 → 픽업 캐릭터)");
             yield return Shot("home");
 
             Click("Btn_Pull10");
@@ -75,8 +76,20 @@ namespace TinyExpedition.Game
             Expect(_app.CurrentScreen == "PullResult", "10연 모집 결과 화면");
             yield return Shot("pull10-result");
 
+            // 모집 뒤 홈: 로비에 원정 자동 편성과 같은 파티가 서고, 누르면 반응하되 세이브는 그대로
             Click("Btn_Back");
-            yield return Wait(0.3f);
+            yield return Wait(0.6f);
+            var lobby = _app.Lobby;
+            Expect(lobby != null && string.Join(",", lobby.ShownIds) == string.Join(",", _app.AutoPartyIds()), "로비 파티 = 자동 편성 (" + string.Join(",", lobby.ShownIds) + ")");
+            string saveBefore = TinyExpedition.Core.Progress.SaveSerializer.Serialize(_app.Session.State);
+            Click("Btn_LobbyUnit_1");
+            yield return Wait(0.25f);
+            Expect(lobby.Reactions == 1, "로비 캐릭터 탭 반응");
+            yield return Shot("home-lobby");
+            string saveAfter = TinyExpedition.Core.Progress.SaveSerializer.Serialize(_app.Session.State);
+            if (saveAfter != saveBefore) Log("세이브 차이 · 전: " + saveBefore.Replace("\n", " ") + " · 후: " + saveAfter.Replace("\n", " "));
+            Expect(saveAfter == saveBefore, "로비 탭은 게임 상태를 바꾸지 않음");
+            yield return Wait(1.8f);
             Click("Btn_Roster");
             yield return Wait(0.3f);
             yield return Shot("roster");
